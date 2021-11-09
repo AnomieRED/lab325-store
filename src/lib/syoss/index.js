@@ -1,5 +1,3 @@
-import { Syoss } from './Syoss';
-import { DataTypes } from './DataTypes';
-import { Model } from './Model';
-
-console.log(Syoss, DataTypes, Model);
+export { Syoss } from './Syoss';
+export { DataTypes } from './DataTypes';
+export { Model } from './Model';

@@ -17,8 +17,14 @@ Product.init({
 		type: DataTypes.STRING
 	}
 }, {
-	modelName: 'Product',
+	modelName: 'products',
 	syoss
 });
 
-Product.update();
+
+// Product.create({ name: 'Table', description: 'For office', price: 2222, manager_id: 1 });
+// Product.findById(1)
+// Product.delete(5);
+// Product.update(6, { name: 'BOOK', description: 'GREEN' });
+
+Product.validator('string');

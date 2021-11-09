@@ -2,16 +2,16 @@ import client from '@postgres';
 
 export default async function createTable() {
 	
-	const manager = await client.query(
-		`CREATE TABLE IF NOT EXISTS manager(
-  			id SERIAL PRIMARY KEY,
-  			name VARCHAR(100) NOT NULL,
-				surname VARCHAR(100) NOT NULL,
-				phone VARCHAR(50) NOT NULL
---				CONSTRAINT check_phonenumber CHECK
--- 				(phone LIKE '([0-9][0-9][0-9]) [0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-			);`
-	);
+// 	const manager = await client.query(
+// 		`CREATE TABLE IF NOT EXISTS manager(
+//   			id SERIAL PRIMARY KEY,
+//   			name VARCHAR(100) NOT NULL,
+// 				surname VARCHAR(100) NOT NULL,
+// 				phone VARCHAR(50) NOT NULL
+// --				CONSTRAINT check_phonenumber CHECK
+// -- 				(phone LIKE '([0-9][0-9][0-9]) [0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+// 			);`
+// 	);
 	
 	const products = await client.query(
 		`CREATE TABLE IF NOT EXISTS products(
@@ -19,8 +19,8 @@ export default async function createTable() {
   			name VARCHAR(60) NOT NULL,
 				description VARCHAR(255) NOT NULL,
 				price INT CHECK(price > 0) NOT NULL,
-				manager_id INT NOT NULL,
-  			FOREIGN KEY(manager_id) REFERENCES manager(id) ON DELETE CASCADE
+				manager_id INT NOT NULL
+--  			FOREIGN KEY(manager_id) REFERENCES manager(id) ON DELETE CASCADE
 			);`
 	);
 	
@@ -45,5 +45,5 @@ export default async function createTable() {
 	console.log(product_features);
 	console.log(feature);
 	console.log(products);
-	console.log(manager);
+	// console.log(manager);
 }

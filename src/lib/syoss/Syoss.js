@@ -17,6 +17,5 @@ export class Syoss {
 	query(query) {
 		return this._db.query(query);
 	}
-	
 }
 

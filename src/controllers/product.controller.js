@@ -76,8 +76,7 @@ class ProductController {
 	async createProduct(req, res) {
 		try {
 			const { name, description, price, manager_id, key, values } = req.body;
-			
-const newProduct = await client.query(`
+			const newProduct = await client.query(`
 				WITH add_product as (INSERT INTO products(name, description, price, manager_id) VALUES($1, $2, $3, $4) RETURNING *),
 				add_feature as (INSERT INTO feature(key, value) VALUES($5, $6) RETURNING *),
 				add_product_features as (INSERT INTO product_features(product_id, feature_id) VALUES((SELECT id FROM add_product), (SELECT id FROM add_feature)) RETURNING *)
