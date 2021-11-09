@@ -1,6 +1,6 @@
 export const DataTypes = {
-	STRING: 'VARCHAR(255)',
-	INTEGER: 'INTEGER',
-	FLOAT: 'FLOAT',
-	BOOLEAN: 'TINYINT'
+	STRING: 'string',
+	INTEGER: 'integer',
+	FLOAT: 'float',
+	BOOLEAN: 'boolean'
 }

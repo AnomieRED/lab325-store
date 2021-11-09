@@ -27,4 +27,12 @@ Product.init({
 // Product.delete(5);
 // Product.update(6, { name: 'BOOK', description: 'GREEN' });
 
-Product.validator('string');
+Product.valid({
+	firstName: {
+	type: DataTypes.STRING,
+		allowNull: false
+	},
+	lastName: {
+		type: DataTypes.STRING
+	}
+});

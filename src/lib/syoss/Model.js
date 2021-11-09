@@ -9,6 +9,12 @@ export class Model {
 	static lastName;
 	static modelName;
 	static syoss;
+	static validator = {
+		[DataTypes.BOOLEAN]: (value) => typeof value === 'boolean',
+		[DataTypes.STRING]: (value) => typeof value == 'string',
+		[DataTypes.FLOAT]: (value) => typeof value == 'string',
+		[DataTypes.INTEGER]: (value) =>  Number.isInteger(value)
+	}
 	
 	static init(attr, options) {
 		this.syoss = options.syoss;
@@ -68,10 +74,14 @@ export class Model {
 		}
 	}
 	
-	// static validator(type) {
-	// 	if (typeof (DataTypes.STRING) !== 'string') {
-	//
-	// 	}
-	// }
+	static valid(attr) {
+		for (const [key, value] of Object.entries(attr)) {
+			const { type } = value;
+			console.log(attr[key]);
+			const valid = this.validator[type];
+			if(!valid(attr[key])) return false;
+		}
+		return true;
+	}
 }
 
