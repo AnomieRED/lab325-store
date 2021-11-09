@@ -6,15 +6,15 @@ export class Model {
 	}
 	
 	static firstName;
-	static lastName;
-	static modelName;
+	static lastName; // todo убрать поля lastName/fisrtName
+	static modelName; // todo сделать динамическую подстановку table name
 	static syoss;
-	static validator = {
+	static templates = {
 		[DataTypes.BOOLEAN]: (value) => typeof value === 'boolean',
 		[DataTypes.STRING]: (value) => typeof value == 'string',
-		[DataTypes.FLOAT]: (value) => typeof value == 'string',
-		[DataTypes.INTEGER]: (value) =>  Number.isInteger(value)
-	}
+		[DataTypes.FLOAT]: (value) => typeof value == 'number',
+		[DataTypes.INTEGER]: (value) => Number.isInteger(value)
+	};
 	
 	static init(attr, options) {
 		this.syoss = options.syoss;
@@ -27,7 +27,7 @@ export class Model {
 		const keys = Object.keys(attr).join(', ');
 		const value = Object.values(attr).map(res => `'${res}'`)
 			.join(', ');
-		const query = `INSERT INTO products(${keys}) VALUES(${value})`;
+		const query = `INSERT INTO ${}(${keys}) VALUES(${value})`;
 		const addProduct = await this.syoss.query(query);
 		if (addProduct.rowCount === 1) {
 			return console.log('PRODUCT ADDED');
@@ -35,7 +35,7 @@ export class Model {
 	}
 	
 	static async findById(id) {
-		if (!id) {
+		if (typeof id !== 'number' || !id) {
 			throw new Error('Check your product ID');
 		}
 		const query = `SELECT * FROM products WHERE id = ${id}`;
@@ -48,7 +48,7 @@ export class Model {
 	}
 	
 	static async update(id, attr) {
-		if (!id) {
+		if (typeof id !== 'number' || !id) {
 			throw new Error('Check your product ID');
 		}
 		let inputUpdate = '';
@@ -64,7 +64,7 @@ export class Model {
 	}
 	
 	static async delete(id) {
-		if (!id) {
+		if (typeof id !== 'number' || !id) {
 			throw new Error('Check your product ID');
 		}
 		const query = `DELETE FROM products WHERE id = ${id}`;
@@ -74,14 +74,12 @@ export class Model {
 		}
 	}
 	
-	static valid(attr) {
+	static validator(attr) {
 		for (const [key, value] of Object.entries(attr)) {
 			const { type } = value;
-			console.log(attr[key]);
-			const valid = this.validator[type];
-			if(!valid(attr[key])) return false;
+			const valid = this.templates[type];
+			if (!valid(attr[key])) return false;
 		}
 		return true;
 	}
 }
-
