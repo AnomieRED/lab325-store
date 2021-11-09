@@ -1,0 +1,32 @@
+{
+  "name": "store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "Yurii Rustanovych",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "fastest-validator": "^1.12.0",
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.17",
+    "@babel/core": "^7.14.6",
+    "@babel/eslint-parser": "^7.15.8",
+    "@babel/node": "^7.14.7",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/plugin-transform-runtime": "^7.12.17",
+    "@babel/preset-env": "^7.14.7",
+    "@lab325/eslint-config": "^1.0.4",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "eslint": "^8.1.0",
+    "nodemon": "^2.0.14"
+  }
+}

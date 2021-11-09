@@ -1,0 +1,17 @@
+{
+  "presets": ["@babel/preset-env"],
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-class-properties",
+      ["module-resolver", {
+      "root": ["./src"],
+      "alias": {
+        "@schema": "./src/validator/schema",
+        "@router": "./src/routes",
+        "@postgres": "./src/lib/db",
+        "@controller": "./src/controllers",
+        "@migration": "./src/lib/migration"
+      }
+    }]
+  ]
+}
