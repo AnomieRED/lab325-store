@@ -26,13 +26,3 @@ Product.init({
 // Product.findById(1)
 // Product.delete(5);
 // Product.update(6, { name: 'BOOK', description: 'GREEN' });
-
-Product.valid({
-	firstName: {
-	type: DataTypes.STRING,
-		allowNull: false
-	},
-	lastName: {
-		type: DataTypes.STRING
-	}
-});
