@@ -5,72 +5,89 @@ export class Model {
 		if (new.target === Model) throw new Error('Instance Error');
 	}
 	
-	static firstName;
-	static lastName; // todo убрать поля lastName/fisrtName
-	static modelName; // todo сделать динамическую подстановку table name
+	static modelName;
 	static syoss;
 	static templates = {
 		[DataTypes.BOOLEAN]: (value) => typeof value === 'boolean',
 		[DataTypes.STRING]: (value) => typeof value == 'string',
-		[DataTypes.FLOAT]: (value) => typeof value == 'number',
+		[DataTypes.FLOAT]: (value) => typeof value == 'number' && isNaN(value),
 		[DataTypes.INTEGER]: (value) => Number.isInteger(value)
 	};
 	
+	/**
+	 * Syoss init
+	 * @param {Object} attr - Input table rows and type.
+	 * @param {Object} options - Model table name.
+	 * @param {string} options.modelName
+	 * @param {Syoss} options.syoss
+	 */
 	static init(attr, options) {
+		this.validator(attr);
 		this.syoss = options.syoss;
-		this.firstName = options.firstName;
-		this.lastName = options.lastName;
-		this.modelName = attr.modelName;
+		this.modelName = options.modelName;
 	}
 	
 	static async create(attr) {
 		const keys = Object.keys(attr).join(', ');
 		const value = Object.values(attr).map(res => `'${res}'`)
 			.join(', ');
-		const query = `INSERT INTO ${}(${keys}) VALUES(${value})`;
-		const addProduct = await this.syoss.query(query);
-		if (addProduct.rowCount === 1) {
-			return console.log('PRODUCT ADDED');
+		const query = `INSERT INTO ${this.modelName} (${keys}) VALUES(${value}) RETURNING*`;
+		const createItem = await this.syoss.query(query);
+		if (createItem.rowCount === 1) {
+			return createItem.rows[0];
 		}
 	}
 	
 	static async findById(id) {
-		if (typeof id !== 'number' || !id) {
-			throw new Error('Check your product ID');
-		}
-		const query = `SELECT * FROM products WHERE id = ${id}`;
-		const findProduct = await this.syoss.query(query);
-		if (findProduct.rowCount === 1) {
-			return console.log('FIND PRODUCT');
+		if (!id) throw new Error('ID can not be empty');
+		const query = `SELECT * FROM ${this.modelName} WHERE id = ${Number(id)}`;
+		const findById = await this.syoss.query(query);
+		if (findById.rowCount === 1) {
+			return findById.rows[0];
 		} else {
-			throw new Error('PRODUCT NOT FOUND');
+			throw new Error('NOT FOUND');
+		}
+	}
+	
+	/** Find all with pagination
+	 * @param {Number} offset
+	 * @param {Number} limit
+	 */
+	static async findAll(offset, limit) {
+		const query = `SELECT * FROM ${this.modelName} LIMIT ${limit} OFFSET ((${offset} - 1) * ${limit})`;
+		const findAll = await this.syoss.query(query);
+		if (findAll.rowCount !== 0) {
+			return findAll.rows;
+		} else {
+			throw new Error('NOT FOUND');
 		}
 	}
 	
 	static async update(id, attr) {
-		if (typeof id !== 'number' || !id) {
-			throw new Error('Check your product ID');
-		}
+		if (!id) throw new Error('ID can not be empty');
+		console.log(this.modelName);
 		let inputUpdate = '';
 		Object.entries(attr).forEach(([key, value]) => {
 			inputUpdate += `${key} = '${value}', `;
 		});
-		const update = inputUpdate.slice(0, -2);
-		const query = `UPDATE products SET ${update} WHERE id = ${id}`;
-		const updateProduct = await this.syoss.query(query);
-		if (updateProduct.rowCount === 0) {
-			return console.log('PRODUCT UPDATED');
+		const sliceUpdate = inputUpdate.slice(0, -2);
+		const query = `UPDATE ${this.modelName} SET ${sliceUpdate} WHERE id = ${Number(id)} RETURNING*`;
+		const updateItem = await this.syoss.query(query);
+		if (updateItem.rowCount === 1) {
+			return updateItem.rows[0];
+		} else {
+			throw new Error('ERROR UPDATE');
 		}
 	}
 	
 	static async delete(id) {
-		if (typeof id !== 'number' || !id) {
-			throw new Error('Check your product ID');
-		}
-		const query = `DELETE FROM products WHERE id = ${id}`;
-		const deleteProduct = await this.syoss.query(query);
-		if (deleteProduct.rowCount === 0) {
-			return console.log('PRODUCT DELETED');
+		if (id === '' || id === ' ') throw new Error('ID can not be empty');
+		const query = `DELETE FROM ${this.modelName} WHERE id = ${Number(id)}`;
+		const deleteItem = await this.syoss.query(query);
+		if (deleteItem.rowCount === 1) {
+			return 'true';
+		} else {
+			return deleteItem.command;
 		}
 	}
 	

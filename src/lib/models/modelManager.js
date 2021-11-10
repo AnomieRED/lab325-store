@@ -5,28 +5,22 @@ import { Syoss } from '../syoss/Syoss';
 const { POSTGRES_USER,  POSTGRES_HOST, POSTGRES_DB, POSTGRES_PASSWORD } = process.env;
 const syoss = new Syoss(POSTGRES_USER, POSTGRES_HOST, POSTGRES_DB, POSTGRES_PASSWORD, 5432);
 
-class Product extends Model {
+class Manager extends Model {
 }
 
-Product.init({
+Manager.init({
 	name: {
 		type: DataTypes.STRING
 	},
-	description: {
+	surname: {
 		type: DataTypes.STRING
 	},
-	price: {
-		type: DataTypes.INTEGER
-	},
-	manager_id: {
+	phone: {
 		type: DataTypes.INTEGER
 	}
 }, {
-	modelName: 'products',
+	modelName: 'manager',
 	syoss
 });
 
-export default Product;
-
-// Product.create({ name: 'Monitor', description: 'For office', price: 2222, manager_id: 1 });
-// Product.update(6, { name: 'HOBBIT', description: 'FRODO', price: 2010 });
+export default Manager;

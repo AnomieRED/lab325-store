@@ -3,7 +3,6 @@ import express from 'express';
 import '@postgres';
 import productRouter from '@router/product.router';
 import managerRouter from '@router/manager.router';
-import './lib/models/modelProduct';
 import createTable from '@migration';
 
 const app = express();
