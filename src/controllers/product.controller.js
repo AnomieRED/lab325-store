@@ -67,7 +67,7 @@ class ProductController {
 		try {
 			const { name, description, price, manager_id, key, value } = req.body;
 			if(!key || !value) {
-				return res.status(404).json('Fields cannot be empty');
+				return res.status(404).send({ error: 'Fields cannot be empty' });
 			}
 			const check = validator.product({ name, description, price, manager_id });
 			if(check) {
@@ -92,7 +92,7 @@ class ProductController {
 			const productId = req.params.id;
 			const { key, value } = req.body;
 			if(!key || !value) {
-				return res.status(404).json('Fields cannot be empty');
+				return res.status(404).send({ error: 'Fields cannot be empty' });
 			}
 			const newFeature = await Feature.create({ key, value });
 			const addProductFeatures = await client.query(`
@@ -135,6 +135,7 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const deletedProduct = await Product.delete(productId);
+			const del =
 			console.log('DELETE PRODUCT');
 			res.status(200).json(deletedProduct);
 		} catch (error) {

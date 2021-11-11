@@ -1,6 +1,6 @@
 export const DataTypes = {
 	STRING: 'string',
-	INTEGER: 'integer',
-	FLOAT: 'float',
+	INTEGER: 'number',
+	FLOAT: 'number',
 	BOOLEAN: 'boolean'
 }

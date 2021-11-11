@@ -1,18 +1,12 @@
 import { DataTypes } from './DataTypes';
 
 export class Model {
+	static modelName;
+	static syoss;
+	
 	constructor() {
 		if (new.target === Model) throw new Error('Instance Error');
 	}
-	
-	static modelName;
-	static syoss;
-	static templates = {
-		[DataTypes.BOOLEAN]: (value) => typeof value === 'boolean',
-		[DataTypes.STRING]: (value) => typeof value === 'string',
-		[DataTypes.FLOAT]: (value) => typeof value === 'number',
-		[DataTypes.INTEGER]: (value) => Number.isInteger(value)
-	};
 	
 	/**
 	 * Syoss init
@@ -29,8 +23,10 @@ export class Model {
 	
 	static async create(attr) {
 		this.validator(attr);
-		const keys = Object.keys(attr).join(', ');
-		const value = Object.values(attr).map(res => `'${res}'`)
+		const keys = Object.keys(attr)
+			.join(', ');
+		const value = Object.values(attr)
+			.map(res => `'${res}'`)
 			.join(', ');
 		const query = `INSERT INTO ${this.modelName} (${keys}) VALUES(${value}) RETURNING*`;
 		const createItem = await this.syoss.query(query);
@@ -40,7 +36,7 @@ export class Model {
 	}
 	
 	static async findById(id) {
-		if (id === ' ') throw new Error('ID can not be empty');
+		if (id === ' ') throw new Error('ID cannot be empty');
 		const query = `SELECT * FROM ${this.modelName} WHERE id = ${Number(id)}`;
 		const findById = await this.syoss.query(query);
 		if (findById.rowCount === 1) {
@@ -55,7 +51,6 @@ export class Model {
 	 * @param {Number} limit
 	 */
 	static async findAll(offset, limit) {
-		console.log(offset, limit);
 		const query = `SELECT * FROM ${this.modelName} LIMIT ${limit} OFFSET ((${offset} - 1) * ${limit})`;
 		const findAll = await this.syoss.query(query);
 		if (findAll.rowCount !== 0) {
@@ -66,12 +61,13 @@ export class Model {
 	}
 	
 	static async update(id, attr) {
-		if (id === ' ') throw new Error('ID can not be empty');
+		if (id === ' ') throw new Error('ID cannot be empty');
 		this.validator(attr);
 		let inputUpdate = '';
-		Object.entries(attr).forEach(([key, value]) => {
-			inputUpdate += `${key} = '${value}', `;
-		});
+		Object.entries(attr)
+			.forEach(([key, value]) => {
+				inputUpdate += `${key} = '${value}', `;
+			});
 		const sliceUpdate = inputUpdate.slice(0, -2);
 		const query = `UPDATE ${this.modelName} SET ${sliceUpdate} WHERE id = ${Number(id)} RETURNING*`;
 		const updateItem = await this.syoss.query(query);
@@ -94,12 +90,27 @@ export class Model {
 	}
 	
 	static validator(attr) {
-		for (const [key, value] of Object.entries(attr)) {
-			const { type } = value;
-			if (!attr[value]) return false;
-			const valid = this.templates[type];
-			if (!valid(attr[key])) return false;
-		}
-		return true;
+		if(!attr) throw new Error('Fields cannot be empty');
+		const value = Object.values(attr);
+		value.forEach(data => {
+			let result;
+			switch(data) {
+				case DataTypes.STRING:
+					result = typeof data === 'string';
+					break;
+				case DataTypes.INTEGER:
+					result = typeof data === 'number';
+					break;
+				case DataTypes.FLOAT:
+					result = typeof data === 'number';
+					break;
+				case DataTypes.BOOLEAN:
+					result = typeof data === 'boolean';
+					break;
+				default:
+					result = false;
+			}
+			return result;
+		});
 	}
 }

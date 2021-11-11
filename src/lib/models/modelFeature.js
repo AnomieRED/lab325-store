@@ -9,6 +9,9 @@ class Feature extends Model {
 }
 
 Feature.init({
+	key: {
+		type: DataTypes.STRING
+	},
 	value: {
 		type: DataTypes.STRING
 	}
