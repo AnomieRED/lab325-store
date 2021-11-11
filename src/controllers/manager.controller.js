@@ -1,7 +1,6 @@
 import Manager from '@models/modelManager';
 import { validator } from '@validation/validator';
 
-
 class ManagerController {
 	async getManagerByProduct(req, res) {
 		try {
@@ -30,8 +29,11 @@ class ManagerController {
 	async updateManager(req, res) {
 		try {
 			const managerId = req.params.id;
-			const { name, surname, phone } = req.body;
-			const updateManager = await Manager.update(managerId, { name, surname, phone });
+			const update = req.body;
+			if(update.phone.length > 12 || update.phone.length < 12) {
+				return res.status(404).send({ error: 'Incorrect phone number' });
+			}
+			const updateManager = await Manager.update(managerId, update);
 			console.log('UPDATE MANAGER');
 			res.status(200).json(updateManager);
 		} catch (error) {

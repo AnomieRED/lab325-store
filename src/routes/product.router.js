@@ -9,6 +9,7 @@ productRouter.get('/products/:id', Controllers.getProductManager);
 productRouter.post('/product', Controllers.createProduct);
 productRouter.post('/feature/:id', Controllers.addFeature);
 productRouter.put('/product/:id', Controllers.editProduct);
+productRouter.put('/feature/:id', Controllers.editFeature);
 productRouter.delete('/product/:id', Controllers.deleteProduct);
 
 export default productRouter;

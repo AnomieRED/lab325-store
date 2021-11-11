@@ -20,7 +20,6 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const oneProduct = await Product.findById(productId);
-			
 			const checkFeature = await client.query(`
 			SELECT f.key, f.value
 			FROM products as p
@@ -111,11 +110,23 @@ class ProductController {
 	async editProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			const { name, description, price } = req.body;
-			const editProduct = await Product.update(productId, { name, description, price });
+			const update = req.body;
+			const editProduct = await Product.update(productId, update);
 			console.log('UPDATE PRODUCT');
 			res.status(200).json(editProduct);
 		} catch (error) {
+			res.status(500).send({ error: error.message });
+		}
+	}
+	
+	async editFeature(req, res) {
+		try {
+			const featureId = req.params.id;
+			const update = req.body;
+			const editFeature = await Feature.update(featureId, update);
+			console.log('UPDATE FEATURE');
+			res.status(200).json(editFeature);
+		} catch(error) {
 			res.status(500).send({ error: error.message });
 		}
 	}

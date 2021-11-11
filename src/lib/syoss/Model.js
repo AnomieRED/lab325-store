@@ -28,7 +28,7 @@ export class Model {
 	}
 	
 	static async create(attr) {
-		if(this.validator(attr)) throw new Error('Validate ERROR');
+		this.validator(attr);
 		const keys = Object.keys(attr).join(', ');
 		const value = Object.values(attr).map(res => `'${res}'`)
 			.join(', ');
@@ -55,6 +55,7 @@ export class Model {
 	 * @param {Number} limit
 	 */
 	static async findAll(offset, limit) {
+		console.log(offset, limit);
 		const query = `SELECT * FROM ${this.modelName} LIMIT ${limit} OFFSET ((${offset} - 1) * ${limit})`;
 		const findAll = await this.syoss.query(query);
 		if (findAll.rowCount !== 0) {
