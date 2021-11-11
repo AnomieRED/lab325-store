@@ -1,14 +1,12 @@
 import client from '@postgres';
 import Product from '@models/modelProduct';
 import Feature from '@models/modelFeature';
-import Schema from '@schema/productSchema';
-import Validator from 'fastest-validator';
-const fastValidator = new Validator();
+import { validator } from '@validation/validator';
 
 class ProductController {
 	async getAllProduct(req, res) {
 		try {
-			// todo сделать фильтрацию по характеристикам
+			// todo filter by feature
 			const { offset = 1, limit = 10 } = req.query;
 			const allProducts = await Product.findAll(offset, limit);
 			res.status(200).json(allProducts);
@@ -22,6 +20,19 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const oneProduct = await Product.findById(productId);
+			
+			const checkFeature = await client.query(`
+			SELECT f.key, f.value
+			FROM products as p
+			JOIN product_features as pf ON p.id = pf.product_id
+			JOIN feature as f ON pf.feature_id = f.id
+			JOIN manager as m ON p.manager_id = m.id
+			WHERE p.id = ${productId}
+			GROUP BY f.key, f.value;
+			`);
+			if(checkFeature) {
+				oneProduct.feature = checkFeature.rows;
+			}
 			
 			console.log('GET ONE PRODUCT');
 			res.status(200).json(oneProduct);
@@ -53,20 +64,16 @@ class ProductController {
 		}
 	}
 	
-	// todo add many products??
 	async createProduct(req, res) {
 		try {
 			const { name, description, price, manager_id, key, value } = req.body;
 			if(!key || !value) {
 				return res.status(404).json('Fields cannot be empty');
 			}
-			const check = fastValidator.compile(Schema);
-			let validate = check({ name, description, price, manager_id });
-			console.log(validate);
-			if(validate !== true) {
-				return res.status(404).send({ error: validate[0].message });
+			const check = validator.product({ name, description, price, manager_id });
+			if(check) {
+				return res.status(404).send({ error: check });
 			}
-			
 			const newProduct = await Product.create({ name, description, price, manager_id });
 			const newFeature = await Feature.create({ key, value });
 			const addFeatureProduct = await client.query(`

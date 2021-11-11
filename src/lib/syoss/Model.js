@@ -28,7 +28,7 @@ export class Model {
 	}
 	
 	static async create(attr) {
-		this.validator(attr);
+		if(this.validator(attr)) throw new Error('Validate ERROR');
 		const keys = Object.keys(attr).join(', ');
 		const value = Object.values(attr).map(res => `'${res}'`)
 			.join(', ');

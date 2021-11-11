@@ -27,6 +27,3 @@ Product.init({
 });
 
 export default Product;
-
-// Product.create({ name: 'Monitor', description: 'For office', price: 2222, manager_id: 1 });
-// Product.update(6, { name: 'HOBBIT', description: 'FRODO', price: 2010 });

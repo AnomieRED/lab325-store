@@ -1,4 +1,6 @@
 import Manager from '@models/modelManager';
+import { validator } from '@validation/validator';
+
 
 class ManagerController {
 	async getManagerByProduct(req, res) {
@@ -40,6 +42,10 @@ class ManagerController {
 	async createManager(req, res) {
 		try {
 			const { name, surname, phone } = req.body;
+			const check = validator.manager({ name, surname, phone })
+			if(check) {
+				return res.status(404).send({ error: check });
+			}
 			const addManager = await Manager.create({ name, surname, phone });
 			console.log('CREATE MANAGER');
 			res.status(201).json(addManager);

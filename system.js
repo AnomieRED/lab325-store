@@ -1,6 +1,6 @@
 System.config({
 	'paths': {
-		'@schema/*': './src/validator/*',
+		'@validation/*': './src/validator/*',
 		'@router/*': './src/routes/*',
 		'@postgres': './src/lib/db',
 		'@controller/*': './src/controllers/*',
