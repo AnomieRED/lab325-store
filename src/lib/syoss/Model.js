@@ -9,8 +9,8 @@ export class Model {
 	static syoss;
 	static templates = {
 		[DataTypes.BOOLEAN]: (value) => typeof value === 'boolean',
-		[DataTypes.STRING]: (value) => typeof value == 'string',
-		[DataTypes.FLOAT]: (value) => typeof value == 'number' && isNaN(value),
+		[DataTypes.STRING]: (value) => typeof value === 'string',
+		[DataTypes.FLOAT]: (value) => typeof value === 'number',
 		[DataTypes.INTEGER]: (value) => Number.isInteger(value)
 	};
 	
@@ -28,6 +28,7 @@ export class Model {
 	}
 	
 	static async create(attr) {
+		this.validator(attr);
 		const keys = Object.keys(attr).join(', ');
 		const value = Object.values(attr).map(res => `'${res}'`)
 			.join(', ');
@@ -39,7 +40,7 @@ export class Model {
 	}
 	
 	static async findById(id) {
-		if (!id) throw new Error('ID can not be empty');
+		if (id === ' ') throw new Error('ID can not be empty');
 		const query = `SELECT * FROM ${this.modelName} WHERE id = ${Number(id)}`;
 		const findById = await this.syoss.query(query);
 		if (findById.rowCount === 1) {
@@ -64,8 +65,8 @@ export class Model {
 	}
 	
 	static async update(id, attr) {
-		if (!id) throw new Error('ID can not be empty');
-		console.log(this.modelName);
+		if (id === ' ') throw new Error('ID can not be empty');
+		this.validator(attr);
 		let inputUpdate = '';
 		Object.entries(attr).forEach(([key, value]) => {
 			inputUpdate += `${key} = '${value}', `;
@@ -81,7 +82,7 @@ export class Model {
 	}
 	
 	static async delete(id) {
-		if (id === '' || id === ' ') throw new Error('ID can not be empty');
+		if (id === ' ') throw new Error('ID can not be empty');
 		const query = `DELETE FROM ${this.modelName} WHERE id = ${Number(id)}`;
 		const deleteItem = await this.syoss.query(query);
 		if (deleteItem.rowCount === 1) {
@@ -94,6 +95,7 @@ export class Model {
 	static validator(attr) {
 		for (const [key, value] of Object.entries(attr)) {
 			const { type } = value;
+			if (!attr[value]) return false;
 			const valid = this.templates[type];
 			if (!valid(attr[key])) return false;
 		}

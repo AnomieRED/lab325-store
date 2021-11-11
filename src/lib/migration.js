@@ -25,6 +25,7 @@ export default async function createTable() {
 	const feature = await client.query(
 		`CREATE TABLE IF NOT EXISTS feature(
 			id SERIAL PRIMARY KEY,
+			key VARCHAR(255) NOT NULL,
 			value VARCHAR(255) NOT NULL
 			);`
 	);
@@ -34,7 +35,6 @@ export default async function createTable() {
 			id SERIAL PRIMARY KEY,
 			product_id INT NOT NULL,
 			feature_id INT NOT NULL,
-			name VARCHAR(255) NOT NULL,
 			FOREIGN KEY(product_id) REFERENCES products(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			FOREIGN KEY(feature_id) REFERENCES feature(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);`

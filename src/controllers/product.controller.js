@@ -1,7 +1,8 @@
 import client from '@postgres';
 import Product from '@models/modelProduct';
-import Validator from 'fastest-validator';
+import Feature from '@models/modelFeature';
 import Schema from '@schema/productSchema';
+import Validator from 'fastest-validator';
 const fastValidator = new Validator();
 
 class ProductController {
@@ -21,6 +22,7 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const oneProduct = await Product.findById(productId);
+			
 			console.log('GET ONE PRODUCT');
 			res.status(200).json(oneProduct);
 		} catch (error) {
@@ -54,13 +56,24 @@ class ProductController {
 	// todo add many products??
 	async createProduct(req, res) {
 		try {
-			const { name, description, price, manager_id } = req.body;
+			const { name, description, price, manager_id, key, value } = req.body;
+			if(!key || !value) {
+				return res.status(404).json('Fields cannot be empty');
+			}
 			const check = fastValidator.compile(Schema);
 			let validate = check({ name, description, price, manager_id });
 			console.log(validate);
+			if(validate !== true) {
+				return res.status(404).send({ error: validate[0].message });
+			}
 			
 			const newProduct = await Product.create({ name, description, price, manager_id });
-			
+			const newFeature = await Feature.create({ key, value });
+			const addFeatureProduct = await client.query(`
+			INSERT INTO product_features(product_id, feature_id)
+			VALUES(${newProduct.id}, ${newFeature.id});
+			`);
+			console.log(addFeatureProduct);
 			console.log('CREATE PRODUCT');
 			res.status(201).json(newProduct);
 		} catch (error) {
@@ -71,20 +84,18 @@ class ProductController {
 	async addFeature(req, res) {
 		try {
 			const productId = req.params.id;
-			if (!productId) {
-				return res.status(404).json('Check your product ID');
-			}
 			const { key, value } = req.body;
-			const newFeature = await client.query(`
-			WITH add_feature as (INSERT INTO feature(key, value) VALUES($1, $2) RETURNING *),
-			add_product_feature as (INSERT INTO product_features(product_id, feature_id)
-			VALUES($3, (SELECT id FROM add_feature)))
-			SELECT add_feature.key, add_feature.value FROM add_feature
-			WHERE add_feature.id = (SELECT id FROM add_feature);`,
-				[key, value, productId]
-			);
+			if(!key || !value) {
+				return res.status(404).json('Fields cannot be empty');
+			}
+			const newFeature = await Feature.create({ key, value });
+			const addProductFeatures = await client.query(`
+			INSERT INTO product_features(product_id, feature_id)
+			VALUES(${productId}, ${newFeature.id});
+			`);
+			console.log(addProductFeatures);
 			console.log('ADD FEATURE FOR PRODUCT');
-			res.status(201).json(newFeature.rows[0]);
+			res.status(201).json(newFeature);
 		} catch (error) {
 			res.status(500).send({ error: error.message });
 		}

@@ -165,4 +165,11 @@ LIMIT 10 OFFSET 1;
 --JOIN product_features ON update_product.id = product_features.product_id
 --JOIN feature ON product_features.feature_id = feature.id
 --WHERE update_product.id = (SELECT id FROM update_product);`,
---[name, description, price, productId, key, value]
+
+
+--ADD FEATURE FOR PRODUCT
+--WITH add_feature as (INSERT INTO feature(key, value) VALUES($1, $2) RETURNING *),
+--add_product_feature as (INSERT INTO product_features(product_id, feature_id)
+--VALUES($3, (SELECT id FROM add_feature)))
+--SELECT add_feature.key, add_feature.value FROM add_feature
+--WHERE add_feature.id = (SELECT id FROM add_feature);`,
