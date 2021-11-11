@@ -135,7 +135,13 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const deletedProduct = await Product.delete(productId);
-			const del =
+			const deleteFeature = await client.query(`
+			WITH f as (DELETE FROM feature WHERE id IN
+			(SELECT f.id FROM feature as f JOIN product_features as pf on f.id = pf.feature_id WHERE pf.product_id = ${productId}))
+			DELETE FROM product_features WHERE id IN
+			(SELECT pf.feature_id FROM products as p JOIN product_features as pf on p.id = pf.product_id WHERE p.id = ${productId})
+			`);
+			console.log(deleteFeature);
 			console.log('DELETE PRODUCT');
 			res.status(200).json(deletedProduct);
 		} catch (error) {

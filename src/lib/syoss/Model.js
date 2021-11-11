@@ -92,8 +92,8 @@ export class Model {
 	static validator(attr) {
 		if(!attr) throw new Error('Fields cannot be empty');
 		const value = Object.values(attr);
+		let result;
 		value.forEach(data => {
-			let result;
 			switch(data) {
 				case DataTypes.STRING:
 					result = typeof data === 'string';
@@ -110,7 +110,7 @@ export class Model {
 				default:
 					result = false;
 			}
-			return result;
 		});
+		return result;
 	}
 }
