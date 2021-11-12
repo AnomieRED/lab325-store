@@ -11,7 +11,8 @@
         "@postgres": "./src/lib/db",
         "@controller": "./src/controllers",
         "@migration": "./src/lib/migration",
-        "@models": "./src/lib/models"
+        "@models": "./src/lib/models",
+        "@filter": "./src/lib/syoss/filter"
       }
     }]
   ]

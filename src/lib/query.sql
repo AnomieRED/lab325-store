@@ -103,7 +103,7 @@ JOIN product_features as pf ON p.id = pf.product_id
 JOIN feature as f ON pf.feature_id = f.id
 JOIN manager as m ON p.manager_id = m.id
 GROUP BY p.id, p.name, m.name, m.surname)
-select * from filter_all_products where features->>'green' = '5kg'
+select * from filter_all_products where features->>'color' = 'white'
 LIMIT 10 OFFSET 1;
 
 ----QUERY CONTROLLERS

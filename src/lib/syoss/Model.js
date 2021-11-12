@@ -1,4 +1,5 @@
 import { DataTypes } from './DataTypes';
+import FilterModel from '@filter/filterModel';
 
 export class Model {
 	static modelName;
@@ -16,13 +17,13 @@ export class Model {
 	 * @param {Syoss} options.syoss
 	 */
 	static init(attr, options) {
-		this.validator(attr);
+		Model.#validator(attr);
 		this.syoss = options.syoss;
 		this.modelName = options.modelName;
 	}
 	
 	static async create(attr) {
-		this.validator(attr);
+		Model.#validator(attr);
 		const keys = Object.keys(attr)
 			.join(', ');
 		const value = Object.values(attr)
@@ -47,22 +48,50 @@ export class Model {
 	}
 	
 	/** Find all with pagination
-	 * @param {Number} offset
-	 * @param {Number} limit
+	 * @param {Object} options - Input object for item filtering
 	 */
-	static async findAll(offset, limit) {
-		const query = `SELECT * FROM ${this.modelName} LIMIT ${limit} OFFSET ((${offset} - 1) * ${limit})`;
-		const findAll = await this.syoss.query(query);
-		if (findAll.rowCount !== 0) {
-			return findAll.rows;
+	static async findAll(options) {
+		/**
+		 * @param {Object} options.where.or -Input object for condition AND / OR
+		 */
+		if (options?.where?.or) {
+			const filter = FilterModel.findByConditionOr(options);
+			const query = `SELECT * FROM ${this.modelName} WHERE ${filter[0]}(${filter[1]})`;
+			console.log('Options OR: ', query);
+			const findByFilter = await this.syoss.query(query);
+			if (findByFilter.rowCount !== 0) {
+				return findByFilter.rows;
+			} else {
+				throw new Error('NOT FOUND');
+			}
+			
+			/** Find all with pagination
+			 * @param {Object} options.where - Input object for condition AND
+			 */
+		} else if (options?.where) {
+			const filter = FilterModel.findByConditionAnd(options);
+			const query = `SELECT * FROM ${this.modelName} WHERE ${filter}`;
+			console.log('Options AND: ', query);
+			const findByFilter = await this.syoss.query(query);
+			if (findByFilter.rowCount !== 0) {
+				return findByFilter.rows;
+			} else {
+				throw new Error('NOT FOUND');
+			}
 		} else {
-			throw new Error('NOT FOUND');
+			const query = `SELECT * FROM ${this.modelName}`;
+			const findAll = await this.syoss.query(query);
+			if (findAll.rowCount !== 0) {
+				return findAll.rows;
+			} else {
+				throw new Error('NOT FOUND');
+			}
 		}
 	}
 	
 	static async update(id, attr) {
 		if (id === ' ') throw new Error('ID cannot be empty');
-		this.validator(attr);
+		Model.#validator(attr);
 		let inputUpdate = '';
 		Object.entries(attr)
 			.forEach(([key, value]) => {
@@ -89,12 +118,12 @@ export class Model {
 		}
 	}
 	
-	static validator(attr) {
-		if(!attr) throw new Error('Fields cannot be empty');
+	static #validator(attr) {
+		if (!attr) throw new Error('Fields cannot be empty');
 		const value = Object.values(attr);
 		let result;
 		value.forEach(data => {
-			switch(data) {
+			switch (data) {
 				case DataTypes.STRING:
 					result = typeof data === 'string';
 					break;

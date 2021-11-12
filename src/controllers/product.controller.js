@@ -7,8 +7,9 @@ class ProductController {
 	async getAllProduct(req, res) {
 		try {
 			// todo filter by feature
-			const { offset = 1, limit = 10 } = req.query;
-			const allProducts = await Product.findAll(offset, limit);
+			// const { offset = 1, limit = 10 } = req.query;
+			const { where } = req.body;
+			const allProducts = await Product.findAll({ where });
 			res.status(200).json(allProducts);
 			console.log('GET ALL PRODUCTS');
 		} catch (error) {
@@ -32,7 +33,6 @@ class ProductController {
 			if(checkFeature) {
 				oneProduct.feature = checkFeature.rows;
 			}
-			
 			console.log('GET ONE PRODUCT');
 			res.status(200).json(oneProduct);
 		} catch (error) {
