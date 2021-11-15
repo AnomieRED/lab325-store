@@ -2,32 +2,32 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert(
-			'product_features',
+			'productFeature',
 	    [
 		    {
-					product_id: 1,
-			    feature_id: 1,
+					productId: 1,
+			    featureId: 1,
 			    title: 'Color',
 			    createdAt: new Date(),
 			    updatedAt: new Date()
 		    },
 		    {
-			    product_id: 2,
-			    feature_id: 2,
+			    productId: 2,
+			    featureId: 2,
 			    title: 'Diagonal',
 			    createdAt: new Date(),
 			    updatedAt: new Date()
 		    },
 		    {
-			    product_id: 3,
-			    feature_id: 3,
+			    productId: 3,
+			    featureId: 3,
 			    title: 'Height',
 			    createdAt: new Date(),
 			    updatedAt: new Date()
 		    },
 		    {
-			    product_id: 4,
-			    feature_id: 4,
+			    productId: 4,
+			    featureId: 4,
 			    title: 'CPU',
 			    createdAt: new Date(),
 			    updatedAt: new Date()
@@ -36,6 +36,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-		await queryInterface.bulkDelete('product_features', null, {});
+		await queryInterface.bulkDelete('productFeature', null, {});
   }
 };

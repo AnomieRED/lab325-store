@@ -1,109 +1,186 @@
+/* eslint-disable */
 import client from '@postgres';
-import Product from '@models/modelProduct';
-import Feature from '@models/modelFeature';
+import model from '../models/index';
 import { validator } from '@validation/validator';
+
+const {
+	Manager,
+	Product,
+	Feature,
+	ProductFeature
+} = model;
 
 class ProductController {
 	async getAllProduct(req, res) {
 		try {
-			// todo filter by feature
-			// const { offset = 1, limit = 10 } = req.query;
-			const { where } = req.body;
-			const allProducts = await Product.findAll({ where });
-			res.status(200).json(allProducts);
+			const {
+				offset = 0,
+				limit = 10
+			} = req.query;
+			const where = req.body;
+			const allProducts = await Product.findAll({
+				offset,
+				limit,
+				where,
+				include: {
+					model: ProductFeature,
+					attributes: ['id', 'name'],
+					include: {
+						model: Feature,
+						attributes: ['value']
+					}
+				}
+			});
+			if (allProducts.length === 0) return res.json('Not found');
+			res.status(200)
+				.json(allProducts);
 			console.log('GET ALL PRODUCTS');
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
 	async getOneProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			const oneProduct = await Product.findById(productId);
-			const checkFeature = await client.query(`
-			SELECT f.key, f.value
-			FROM products as p
-			JOIN product_features as pf ON p.id = pf.product_id
-			JOIN feature as f ON pf.feature_id = f.id
-			JOIN manager as m ON p.manager_id = m.id
-			WHERE p.id = ${productId}
-			GROUP BY f.key, f.value;
-			`);
-			if(checkFeature) {
-				oneProduct.feature = checkFeature.rows;
-			}
+			const oneProduct = await Product.findOne({
+				where: {
+					id: productId
+				},
+				include: {
+					model: ProductFeature,
+					attributes: ['id', 'name'],
+					include: {
+						model: Feature,
+						attributes: ['value']
+					}
+				}
+			});
+			if (oneProduct.length === 0) return res.json('Not found');
 			console.log('GET ONE PRODUCT');
-			res.status(200).json(oneProduct);
+			res.status(200)
+				.json(oneProduct);
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
 	async getProductManager(req, res) {
 		try {
-			const managerId = req.params.id;
-			const { offset = 1, limit = 10 } = req.query;
-			const product = await client.query(
-				`SELECT m.id, concat_ws(' ', m.name, m.surname) as manager, m.phone,
-				p.id, p.name, p.description, p.price,
-				json_object_agg(f.key, f.value) as features
-				FROM manager as m
-				JOIN products as p ON m.id = p.manager_id
-				JOIN product_features as pf ON p.id = pf.product_id
-				JOIN feature as f ON f.id = pf.feature_id
-				WHERE m.id = $3 GROUP BY m.id, p.id, m.name, m.surname, m.phone, p.name
-				LIMIT $2 OFFSET (($1 - 1) * $2);`,
-				[offset, limit, managerId]
-			);
+			// const managerId = req.params.id;
+			const {
+				offset = 1,
+				limit = 10
+			} = req.query;
+			const name = req.body;
+			const oneManager = await Manager.findOne({
+				offset,
+				limit,
+				name,
+				include: {
+					model: Product,
+					attributes: ['id', 'name', 'description', 'price'],
+					include: {
+						model: ProductFeature,
+						attributes: ['name'],
+						include: {
+							model: Feature,
+							attributes: ['value']
+						}
+					}
+				}
+			});
 			console.log('GET PRODUCT MANAGER');
-			res.status(200).json(product.rows);
+			res.status(200)
+				.json(oneManager);
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
 	async createProduct(req, res) {
 		try {
-			const { name, description, price, manager_id, key, value } = req.body;
-			if(!key || !value) {
-				return res.status(404).send({ error: 'Fields cannot be empty' });
+			const {
+				name,
+				description,
+				price,
+				manager_id,
+				title,
+				value
+			} = req.body;
+			if (!title || !value) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
 			}
-			const check = validator.product({ name, description, price, manager_id });
-			if(check) {
-				return res.status(404).send({ error: check });
+			console.log(req.body);
+			const check = validator.product({
+				name,
+				description,
+				price,
+				manager_id
+			});
+			if (check) {
+				return res.status(404)
+					.send({ error: check });
 			}
-			const newProduct = await Product.create({ name, description, price, manager_id });
-			const newFeature = await Feature.create({ key, value });
-			const addFeatureProduct = await client.query(`
-			INSERT INTO product_features(product_id, feature_id)
-			VALUES(${newProduct.id}, ${newFeature.id});
-			`);
-			console.log(addFeatureProduct);
+			const newProduct = await Product.create({
+				name,
+				description,
+				price,
+				manager_id
+			});
+			const newFeature = await Feature.create({ value });
+			const newProductFeatures = await ProductFeature.create({
+				title,
+				product_id: newProduct.id,
+				feature_id: newFeature.id
+			});
+			
+			await newProduct.reload({
+				include: {
+					model: ProductFeature,
+					include: [Feature]
+				}
+			});
+			console.log(newProductFeatures, newFeature);
 			console.log('CREATE PRODUCT');
-			res.status(201).json(newProduct);
+			res.status(201)
+				.json(newProduct);
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
 	async addFeature(req, res) {
 		try {
 			const productId = req.params.id;
-			const { key, value } = req.body;
-			if(!key || !value) {
-				return res.status(404).send({ error: 'Fields cannot be empty' });
+			const {
+				key,
+				value
+			} = req.body;
+			if (!key || !value) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
 			}
-			const newFeature = await Feature.create({ key, value });
+			const newFeature = await Feature.create({
+				key,
+				value
+			});
 			const addProductFeatures = await client.query(`
 			INSERT INTO product_features(product_id, feature_id)
 			VALUES(${productId}, ${newFeature.id});
 			`);
 			console.log(addProductFeatures);
 			console.log('ADD FEATURE FOR PRODUCT');
-			res.status(201).json(newFeature);
+			res.status(201)
+				.json(newFeature);
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
@@ -113,9 +190,11 @@ class ProductController {
 			const update = req.body;
 			const editProduct = await Product.update(productId, update);
 			console.log('UPDATE PRODUCT');
-			res.status(200).json(editProduct);
+			res.status(200)
+				.json(editProduct);
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
@@ -125,9 +204,11 @@ class ProductController {
 			const update = req.body;
 			const editFeature = await Feature.update(featureId, update);
 			console.log('UPDATE FEATURE');
-			res.status(200).json(editFeature);
-		} catch(error) {
-			res.status(500).send({ error: error.message });
+			res.status(200)
+				.json(editFeature);
+		} catch (error) {
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 	
@@ -143,9 +224,11 @@ class ProductController {
 			`);
 			console.log(deleteFeature);
 			console.log('DELETE PRODUCT');
-			res.status(200).json(deletedProduct);
+			res.status(200)
+				.json(deletedProduct);
 		} catch (error) {
-			res.status(500).send({ error: error.message });
+			res.status(500)
+				.send({ error: error.message });
 		}
 	}
 }
