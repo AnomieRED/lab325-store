@@ -1,7 +1,7 @@
 /* eslint-disable */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('features', {
+    await queryInterface.createTable('feature', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -22,6 +22,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('features');
+    await queryInterface.dropTable('feature');
   }
 };

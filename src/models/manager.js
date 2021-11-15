@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			Manager.hasMany(models.Products, {
-				foreignKey: 'manager_id',
+				foreignKey: 'managerId',
 				onDelete: 'cascade',
 				onUpdate: 'cascade'
 			});
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
 	}, {
 		sequelize,
 		modelName: 'Manager',
-		tableName: 'managers'
+		tableName: 'manager'
 	});
 	return Manager;
 };

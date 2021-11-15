@@ -5,9 +5,9 @@ import { validator } from '@validation/validator';
 
 const {
 	Manager,
-	Products,
+	Product,
 	Feature,
-	Product_features
+	ProductFeature
 } = model;
 
 class ProductController {
@@ -18,12 +18,12 @@ class ProductController {
 				limit = 10
 			} = req.query;
 			const where = req.body;
-			const allProducts = await Products.findAll({
+			const allProducts = await Product.findAll({
 				offset,
 				limit,
 				where,
 				include: {
-					model: Product_features,
+					model: ProductFeature,
 					attributes: ['id', 'name'],
 					include: {
 						model: Feature,
@@ -44,12 +44,12 @@ class ProductController {
 	async getOneProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			const oneProduct = await Products.findOne({
+			const oneProduct = await Product.findOne({
 				where: {
 					id: productId
 				},
 				include: {
-					model: Product_features,
+					model: ProductFeature,
 					attributes: ['id', 'name'],
 					include: {
 						model: Feature,
@@ -80,10 +80,10 @@ class ProductController {
 				limit,
 				name,
 				include: {
-					model: Products,
+					model: Product,
 					attributes: ['id', 'name', 'description', 'price'],
 					include: {
-						model: Product_features,
+						model: ProductFeature,
 						attributes: ['name'],
 						include: {
 							model: Feature,
@@ -126,14 +126,14 @@ class ProductController {
 				return res.status(404)
 					.send({ error: check });
 			}
-			const newProduct = await Products.create({
+			const newProduct = await Product.create({
 				name,
 				description,
 				price,
 				manager_id
 			});
 			const newFeature = await Feature.create({ value });
-			const newProductFeatures = await Product_features.create({
+			const newProductFeatures = await ProductFeature.create({
 				title,
 				product_id: newProduct.id,
 				feature_id: newFeature.id
@@ -141,7 +141,7 @@ class ProductController {
 			
 			await newProduct.reload({
 				include: {
-					model: Product_features,
+					model: ProductFeature,
 					include: [Feature]
 				}
 			});
@@ -188,7 +188,7 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const update = req.body;
-			const editProduct = await Products.update(productId, update);
+			const editProduct = await Product.update(productId, update);
 			console.log('UPDATE PRODUCT');
 			res.status(200)
 				.json(editProduct);
@@ -215,7 +215,7 @@ class ProductController {
 	async deleteProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			const deletedProduct = await Products.delete(productId);
+			const deletedProduct = await Product.delete(productId);
 			const deleteFeature = await client.query(`
 			WITH f as (DELETE FROM feature WHERE id IN
 			(SELECT f.id FROM feature as f JOIN product_features as pf on f.id = pf.feature_id WHERE pf.product_id = ${productId}))

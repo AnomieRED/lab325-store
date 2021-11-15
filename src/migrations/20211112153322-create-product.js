@@ -1,27 +1,26 @@
 /* eslint-disable */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('product_features', {
+    await queryInterface.createTable('product', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
+      name: {
         type: Sequelize.STRING
       },
-      product_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'products',
-          key: 'id'
-        }
+      description: {
+        type: Sequelize.STRING
       },
-      feature_id: {
+      price: {
+        type: Sequelize.INTEGER
+      },
+      managerId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'features',
+          model: 'manager',
           key: 'id'
         }
       },
@@ -36,6 +35,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('product_features');
+    await queryInterface.dropTable('product');
   }
 };
