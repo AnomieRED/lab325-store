@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Feature.hasMany(models.ProductFeatures, {foreignKey: 'featureId', onDelete: 'cascade', onUpdate: 'cascade'});
+      Feature.hasMany(models.ProductFeature, {foreignKey: 'featureId', onDelete: 'cascade', onUpdate: 'cascade'});
     }
   }
   Feature.init({
