@@ -1,5 +1,5 @@
 import model from '../models/index';
-// import { validator } from '@validation/validator';
+import { validator } from '@validation/validator';
 
 const { Manager } = model;
 
@@ -51,15 +51,15 @@ class ManagerController {
 				surname,
 				phone
 			} = req.body;
-			// const check = validator.manager({
-			// 	name,
-			// 	surname,
-			// 	phone
-			// });
-			// if (check) {
-			// 	return res.status(404)
-			// 		.send({ error: check });
-			// }
+			const check = validator.manager({
+				name,
+				surname,
+				phone
+			});
+			if (check) {
+				return res.status(404)
+					.send({ error: check });
+			}
 			const addManager = await Manager.create({
 				name,
 				surname,
