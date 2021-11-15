@@ -3,4 +3,4 @@ export const DataTypes = {
 	INTEGER: 'number',
 	FLOAT: 'number',
 	BOOLEAN: 'boolean'
-}
+};
