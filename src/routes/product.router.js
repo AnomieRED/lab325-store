@@ -5,7 +5,7 @@ const productRouter = new Router();
 
 productRouter.get('/product', Controllers.getAllProduct);
 productRouter.get('/product/:id', Controllers.getOneProduct);
-productRouter.get('/products/:id', Controllers.getProductManager);
+productRouter.get('/products', Controllers.getProductManager);
 productRouter.post('/product', Controllers.createProduct);
 productRouter.post('/feature/:id', Controllers.addFeature);
 productRouter.put('/product/:id', Controllers.editProduct);
