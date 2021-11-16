@@ -1,7 +1,7 @@
 /* eslint-disable */
 import client from '@postgres';
 import model from '../models/index';
-import { validator } from '@validation/validator';
+// import { validator } from '@validation/validator';
 
 const {
 	Manager,
@@ -9,6 +9,8 @@ const {
 	Feature,
 	ProductFeature
 } = model;
+
+const product = Feature.findOne();
 
 class ProductController {
 	async getAllProduct(req, res) {
@@ -21,16 +23,17 @@ class ProductController {
 			const allProducts = await Product.findAll({
 				offset,
 				limit,
-				where,
-				include: {
-					model: ProductFeature,
-					attributes: ['id', 'name'],
-					include: {
-						model: Feature,
-						attributes: ['value']
-					}
-				}
+				where
+				// include: {
+				// 	model: ProductFeature,
+				// 	attributes: ['id', 'value'],
+				// 	include: {
+				// 		model: Feature,
+				// 		attributes: ['title']
+				// 	}
+				// }
 			});
+			
 			if (allProducts.length === 0) return res.json('Not found');
 			res.status(200)
 				.json(allProducts);
@@ -50,10 +53,10 @@ class ProductController {
 				},
 				include: {
 					model: ProductFeature,
-					attributes: ['id', 'name'],
+					attributes: ['id', 'value'],
 					include: {
 						model: Feature,
-						attributes: ['value']
+						attributes: ['title']
 					}
 				}
 			});
@@ -69,7 +72,6 @@ class ProductController {
 	
 	async getProductManager(req, res) {
 		try {
-			// const managerId = req.params.id;
 			const {
 				offset = 1,
 				limit = 10
@@ -84,10 +86,10 @@ class ProductController {
 					attributes: ['id', 'name', 'description', 'price'],
 					include: {
 						model: ProductFeature,
-						attributes: ['name'],
+						attributes: ['value'],
 						include: {
 							model: Feature,
-							attributes: ['value']
+							attributes: ['title']
 						}
 					}
 				}
@@ -107,45 +109,48 @@ class ProductController {
 				name,
 				description,
 				price,
-				manager_id,
-				title,
-				value
+				managerId,
+				characterId
 			} = req.body;
-			if (!title || !value) {
-				return res.status(404)
-					.send({ error: 'Fields cannot be empty' });
-			}
-			console.log(req.body);
-			const check = validator.product({
-				name,
-				description,
-				price,
-				manager_id
-			});
-			if (check) {
-				return res.status(404)
-					.send({ error: check });
-			}
+			
+			// if (!title) {
+			// 	return res.status(404)
+			// 		.send({ error: 'Fields cannot be empty' });
+			// }
+			// const check = validator.product({
+			// 	name,
+			// 	description,
+			// 	price,
+			// 	managerId
+			// });
+			// if (check) {
+			// 	return res.status(404)
+			// 		.send({ error: check });
+			// }
 			const newProduct = await Product.create({
 				name,
 				description,
 				price,
-				manager_id
+				managerId,
+				characterId
 			});
-			const newFeature = await Feature.create({ value });
-			const newProductFeatures = await ProductFeature.create({
-				title,
-				product_id: newProduct.id,
-				feature_id: newFeature.id
-			});
+			// const newFeature = await Feature.findOrCreate({where: { title } });
+			// console.log(newFeature);
 			
-			await newProduct.reload({
-				include: {
-					model: ProductFeature,
-					include: [Feature]
-				}
-			});
-			console.log(newProductFeatures, newFeature);
+			// await newProduct.addFeature(newFeature);
+			// const newProductFeature = await ProductFeature.create({
+			// 	title,
+			// 	product_id: newProduct.id,
+			// 	feature_id: newFeature.id
+			// });
+			
+			// await newProduct.reload({
+			// 	include: {
+			// 		model: ProductFeature,
+			// 		include: [Feature]
+			// 	}
+			// });
+			// console.log(newProductFeature, newFeature);
 			console.log('CREATE PRODUCT');
 			res.status(201)
 				.json(newProduct);
@@ -215,14 +220,11 @@ class ProductController {
 	async deleteProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			const deletedProduct = await Product.delete(productId);
-			const deleteFeature = await client.query(`
-			WITH f as (DELETE FROM feature WHERE id IN
-			(SELECT f.id FROM feature as f JOIN product_features as pf on f.id = pf.feature_id WHERE pf.product_id = ${productId}))
-			DELETE FROM product_features WHERE id IN
-			(SELECT pf.feature_id FROM products as p JOIN product_features as pf on p.id = pf.product_id WHERE p.id = ${productId})
-			`);
-			console.log(deleteFeature);
+			const deletedProduct = await Product.destroy({
+				where: {
+					id: productId
+				}
+			});
 			console.log('DELETE PRODUCT');
 			res.status(200)
 				.json(deletedProduct);

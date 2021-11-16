@@ -11,9 +11,10 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			Manager.hasMany(models.Product, {
-				foreignKey: 'managerId',
-				onDelete: 'cascade',
-				onUpdate: 'cascade'
+				foreignKey: {
+					name: 'managerId',
+					allowNull: false
+				}
 			});
 		}
 	}

@@ -8,30 +8,26 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER
 			},
-			title: {
+			value: {
 				type: Sequelize.STRING
 			},
 			productId: {
 				type: Sequelize.INTEGER,
-				references: {
-					model: 'product',
-					key: 'id'
-				}
+				// references: {
+				// 	model: 'product',
+				// 	key: 'id'
+				// },
+				// onDelete: 'SET NULL',
+				// onUpdate: 'CASCADE'
 			},
 			featureId: {
 				type: Sequelize.INTEGER,
-				references: {
-					model: 'feature',
-					key: 'id'
-				}
-			},
-			createdAt: {
-				allowNull: false,
-				type: Sequelize.DATE
-			},
-			updatedAt: {
-				allowNull: false,
-				type: Sequelize.DATE
+				// references: {
+				// 	model: 'feature',
+				// 	key: 'id'
+				// },
+				// onDelete: 'SET NULL',
+				// onUpdate: 'CASCADE'
 			}
 		});
 	},

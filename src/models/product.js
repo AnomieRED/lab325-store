@@ -10,12 +10,13 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Product.belongsTo(models.Manager, { foreignKey: 'managerId' });
-			Product.hasMany(models.ProductFeature, {
-				foreignKey: 'productId',
-				onDelete: 'cascade',
-				onUpdate: 'cascade'
+			Product.belongsTo(models.Manager, {
+				foreignKey: {
+					name: 'managerId',
+					allowNull: false
+				}
 			});
+			Product.hasMany(models.Feature, { foreignKey: 'characterId' });
 		}
 	}
 	
@@ -23,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
 		name: DataTypes.STRING,
 		description: DataTypes.STRING,
 		price: DataTypes.INTEGER,
+		characterId: DataTypes.INTEGER,
 		managerId: DataTypes.INTEGER
 	}, {
 		sequelize,

@@ -22,7 +22,18 @@ module.exports = {
 				references: {
 					model: 'manager',
 					key: 'id'
-				}
+				},
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL'
+			},
+			characterId: {
+				type: Sequelize.INTEGER,
+				references: {
+					model: 'feature',
+					key: 'id'
+				},
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL'
 			},
 			createdAt: {
 				allowNull: false,

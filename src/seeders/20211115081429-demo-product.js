@@ -9,6 +9,7 @@ module.exports = {
 					description: 'made in USA',
 					price: 4000,
 					managerId: 1,
+					characterId: 1,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
@@ -17,6 +18,7 @@ module.exports = {
 					description: 'QHD 2k 144Hz',
 					price: 11000,
 					managerId: 2,
+					characterId: 2,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
@@ -25,6 +27,7 @@ module.exports = {
 					description: 'made in China',
 					price: 800,
 					managerId: 1,
+					characterId: 3,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
@@ -33,6 +36,7 @@ module.exports = {
 					description: 'for game',
 					price: 25000,
 					managerId: 2,
+					characterId: 4,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}

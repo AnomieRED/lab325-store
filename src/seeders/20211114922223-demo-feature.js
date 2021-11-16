@@ -5,22 +5,22 @@ module.exports = {
 			'feature',
 			[
 				{
-					value: 'Black',
+					title: 'Color',
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
 				{
-					value: '27d',
+					title: 'Diagonal',
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
 				{
-					value: '20cm',
+					title: 'Height',
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
 				{
-					value: 'Ryzen',
+					title: 'CPU',
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}

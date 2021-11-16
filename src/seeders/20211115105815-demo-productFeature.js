@@ -7,30 +7,22 @@ module.exports = {
 				{
 					productId: 1,
 					featureId: 1,
-					title: 'Color',
-					createdAt: new Date(),
-					updatedAt: new Date()
+					value: 'Black'
 				},
 				{
 					productId: 2,
 					featureId: 2,
-					title: 'Diagonal',
-					createdAt: new Date(),
-					updatedAt: new Date()
+					value: '27d'
 				},
 				{
 					productId: 3,
 					featureId: 3,
-					title: 'Height',
-					createdAt: new Date(),
-					updatedAt: new Date()
+					value: '20cm'
 				},
 				{
 					productId: 4,
 					featureId: 4,
-					title: 'CPU',
-					createdAt: new Date(),
-					updatedAt: new Date()
+					value: 'Ryzen'
 				}
 			], {});
 	},
