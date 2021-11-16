@@ -10,13 +10,14 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// Feature.hasMany(models.ProductFeature, { foreignKey: 'featureId' });
-			Feature.belongsTo(models.Product, { foreignKey: 'characterId' });
+			Feature.belongsTo(models.Product, { foreignKey: 'productId' });
 		}
 	}
 	
 	Feature.init({
-		title: DataTypes.STRING
+		title: DataTypes.STRING,
+		value: DataTypes.STRING,
+		productId: DataTypes.INTEGER
 	}, {
 		sequelize,
 		modelName: 'Feature',

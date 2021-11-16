@@ -15,8 +15,6 @@ app.use(express.json());
 app.use('/', productRouter);
 app.use('/', managerRouter);
 
-// Manager.create({ name: 'Olga', surname: 'Stelmax', phone: '380991231' }).then(console.log);
-
 // createTable().then(console.log);
 app.listen(PORT, () => {
 	console.log(`Server has been started on port ${PORT}`);

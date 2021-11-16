@@ -4,13 +4,11 @@ import model from '../models/index';
 // import { validator } from '@validation/validator';
 
 const {
-	Manager,
 	Product,
-	Feature,
-	ProductFeature
+	Feature
 } = model;
 
-const product = Feature.findOne();
+// const product = Feature.findOne();
 
 class ProductController {
 	async getAllProduct(req, res) {
@@ -23,15 +21,11 @@ class ProductController {
 			const allProducts = await Product.findAll({
 				offset,
 				limit,
-				where
-				// include: {
-				// 	model: ProductFeature,
-				// 	attributes: ['id', 'value'],
-				// 	include: {
-				// 		model: Feature,
-				// 		attributes: ['title']
-				// 	}
-				// }
+				where,
+				include: {
+					model: Feature,
+					attributes: ['title', 'value']
+				}
 			});
 			
 			if (allProducts.length === 0) return res.json('Not found');
