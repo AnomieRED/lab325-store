@@ -1,14 +1,13 @@
 /* eslint-disable */
 import client from '@postgres';
 import model from '../models/index';
-// import { validator } from '@validation/validator';
+import { validator } from '@validation/validator';
 
 const {
 	Product,
-	Feature
+	Feature,
+	Manager
 } = model;
-
-// const product = Feature.findOne();
 
 class ProductController {
 	async getAllProduct(req, res) {
@@ -22,13 +21,15 @@ class ProductController {
 				offset,
 				limit,
 				where,
+				order: [
+					['id', 'ASC']
+				],
 				include: {
 					model: Feature,
 					attributes: ['title', 'value']
 				}
 			});
-			
-			if (allProducts.length === 0) return res.json('Not found');
+			if (allProducts === null) return res.json('Not found');
 			res.status(200)
 				.json(allProducts);
 			console.log('GET ALL PRODUCTS');
@@ -46,15 +47,11 @@ class ProductController {
 					id: productId
 				},
 				include: {
-					model: ProductFeature,
-					attributes: ['id', 'value'],
-					include: {
-						model: Feature,
-						attributes: ['title']
-					}
+					model: Feature,
+					attributes: ['title', 'value']
 				}
 			});
-			if (oneProduct.length === 0) return res.json('Not found');
+			if (oneProduct === null) return res.json('Not found');
 			console.log('GET ONE PRODUCT');
 			res.status(200)
 				.json(oneProduct);
@@ -64,30 +61,32 @@ class ProductController {
 		}
 	}
 	
-	async getProductManager(req, res) {
+	async getProductByManager(req, res) {
 		try {
 			const {
 				offset = 1,
 				limit = 10
 			} = req.query;
-			const name = req.body;
+			const { name } = req.body;
+			console.log(name);
+			if (!name) {
+				res.status(404)
+					.send({ error: 'Please specify a manager' });
+			}
 			const oneManager = await Manager.findOne({
-				offset,
-				limit,
-				name,
+				where: {
+					name
+				},
 				include: {
 					model: Product,
 					attributes: ['id', 'name', 'description', 'price'],
 					include: {
-						model: ProductFeature,
-						attributes: ['value'],
-						include: {
-							model: Feature,
-							attributes: ['title']
-						}
+						model: Feature,
+						attributes: ['title', 'value']
 					}
 				}
 			});
+			if (oneManager === null) return res.json('Not found');
 			console.log('GET PRODUCT MANAGER');
 			res.status(200)
 				.json(oneManager);
@@ -104,47 +103,41 @@ class ProductController {
 				description,
 				price,
 				managerId,
-				characterId
+				title,
+				value
 			} = req.body;
-			
-			// if (!title) {
-			// 	return res.status(404)
-			// 		.send({ error: 'Fields cannot be empty' });
-			// }
-			// const check = validator.product({
-			// 	name,
-			// 	description,
-			// 	price,
-			// 	managerId
-			// });
-			// if (check) {
-			// 	return res.status(404)
-			// 		.send({ error: check });
-			// }
+			if (!title || !value) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
+			}
+			const check = validator.product({
+				name,
+				description,
+				price,
+				managerId
+			});
+			if (check) {
+				return res.status(404)
+					.send({ error: check });
+			}
 			const newProduct = await Product.create({
 				name,
 				description,
 				price,
-				managerId,
-				characterId
+				managerId
 			});
-			// const newFeature = await Feature.findOrCreate({where: { title } });
-			// console.log(newFeature);
-			
-			// await newProduct.addFeature(newFeature);
-			// const newProductFeature = await ProductFeature.create({
-			// 	title,
-			// 	product_id: newProduct.id,
-			// 	feature_id: newFeature.id
-			// });
-			
-			// await newProduct.reload({
-			// 	include: {
-			// 		model: ProductFeature,
-			// 		include: [Feature]
-			// 	}
-			// });
-			// console.log(newProductFeature, newFeature);
+			const newFeature = await Feature.findOrCreate({
+				where: {
+					title,
+					value,
+					productId: newProduct.id
+				}
+			});
+			await newProduct.reload({
+				include: {
+					model: Feature
+				}
+			});
 			console.log('CREATE PRODUCT');
 			res.status(201)
 				.json(newProduct);
@@ -158,22 +151,18 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const {
-				key,
+				title,
 				value
 			} = req.body;
-			if (!key || !value) {
+			if (!title || !value) {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
 			const newFeature = await Feature.create({
-				key,
-				value
+				title,
+				value,
+				productId: productId
 			});
-			const addProductFeatures = await client.query(`
-			INSERT INTO product_features(product_id, feature_id)
-			VALUES(${productId}, ${newFeature.id});
-			`);
-			console.log(addProductFeatures);
 			console.log('ADD FEATURE FOR PRODUCT');
 			res.status(201)
 				.json(newFeature);
@@ -187,10 +176,17 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const update = req.body;
-			const editProduct = await Product.update(productId, update);
+			const editProduct = await Product.update(update,{
+				where: {
+					id: productId
+				}
+			});
 			console.log('UPDATE PRODUCT');
-			res.status(200)
-				.json(editProduct);
+			if(editProduct[0] === 1) {
+				res.status(200).json('true');
+			} else if(editProduct[0] === 0) {
+				res.status(200).json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -201,10 +197,17 @@ class ProductController {
 		try {
 			const featureId = req.params.id;
 			const update = req.body;
-			const editFeature = await Feature.update(featureId, update);
+			const editFeature = await Feature.update(update, {
+				where: {
+					id: featureId
+				}
+			});
 			console.log('UPDATE FEATURE');
-			res.status(200)
-				.json(editFeature);
+			if(editFeature[0] === 1) {
+				res.status(200).json('true');
+			} else if(editFeature[0] === 0) {
+				res.status(200).json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
