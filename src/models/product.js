@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
 					allowNull: false
 				}
 			});
-			Product.hasMany(models.Feature, { foreignKey: 'productId' });
+			Product.belongsToMany(models.Feature, {
+				through: 'productFeature',
+				foreignKey: 'productId'
+			});
 		}
 	}
 	
@@ -28,7 +31,8 @@ module.exports = (sequelize, DataTypes) => {
 	}, {
 		sequelize,
 		modelName: 'Product',
-		tableName: 'product'
+		tableName: 'product',
+		timestamps: true
 	});
 	return Product;
 };

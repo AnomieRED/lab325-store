@@ -4,7 +4,10 @@
     "password": "root",
     "database": "store",
     "host": "postgres",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "define": {
+      "timestamps": false
+    }
   },
   "test": {
     "username": "user",

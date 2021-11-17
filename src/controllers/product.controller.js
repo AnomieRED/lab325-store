@@ -1,13 +1,17 @@
 /* eslint-disable */
-import client from '@postgres';
 import model from '../models/index';
+import {sequelize} from '../models/index';
+// import {QueryInterface} from 'sequelize';
+import db from '../models/index';
 import { validator } from '@validation/validator';
 
 const {
 	Product,
 	Feature,
-	Manager
+	Manager,
+	productFeature
 } = model;
+
 
 class ProductController {
 	async getAllProduct(req, res) {
@@ -26,7 +30,8 @@ class ProductController {
 				],
 				include: {
 					model: Feature,
-					attributes: ['title', 'value']
+					attributes: ['title'],
+					through: {attributes: ['value']}
 				}
 			});
 			if (allProducts === null) return res.json('Not found');
@@ -48,7 +53,8 @@ class ProductController {
 				},
 				include: {
 					model: Feature,
-					attributes: ['title', 'value']
+					attributes: ['title'],
+					through: {attributes: ['value']}
 				}
 			});
 			if (oneProduct === null) return res.json('Not found');
@@ -82,7 +88,8 @@ class ProductController {
 					attributes: ['id', 'name', 'description', 'price'],
 					include: {
 						model: Feature,
-						attributes: ['title', 'value']
+						attributes: ['title'],
+						through: {attributes: ['value']}
 					}
 				}
 			});
@@ -106,7 +113,8 @@ class ProductController {
 				title,
 				value
 			} = req.body;
-			if (!title || !value) {
+			
+			if (!title) {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
@@ -126,13 +134,11 @@ class ProductController {
 				price,
 				managerId
 			});
-			const newFeature = await Feature.findOrCreate({
-				where: {
-					title,
-					value,
-					productId: newProduct.id
-				}
-			});
+			
+			const [newFeature, isNew] = await Feature.findOrCreate({where: { title }});
+			
+			const a = await newProduct.addFeature(newFeature, { through: { value: 'test' } });
+			
 			await newProduct.reload({
 				include: {
 					model: Feature
@@ -176,16 +182,18 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const update = req.body;
-			const editProduct = await Product.update(update,{
+			const editProduct = await Product.update(update, {
 				where: {
 					id: productId
 				}
 			});
 			console.log('UPDATE PRODUCT');
-			if(editProduct[0] === 1) {
-				res.status(200).json('true');
-			} else if(editProduct[0] === 0) {
-				res.status(200).json('Not found');
+			if (editProduct[0] === 1) {
+				res.status(200)
+					.json('true');
+			} else if (editProduct[0] === 0) {
+				res.status(200)
+					.json('Not found');
 			}
 		} catch (error) {
 			res.status(500)
@@ -203,10 +211,12 @@ class ProductController {
 				}
 			});
 			console.log('UPDATE FEATURE');
-			if(editFeature[0] === 1) {
-				res.status(200).json('true');
-			} else if(editFeature[0] === 0) {
-				res.status(200).json('Not found');
+			if (editFeature[0] === 1) {
+				res.status(200)
+					.json('true');
+			} else if (editFeature[0] === 0) {
+				res.status(200)
+					.json('Not found');
 			}
 		} catch (error) {
 			res.status(500)

@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
 	}, {
 		sequelize,
 		modelName: 'Manager',
-		tableName: 'manager'
+		tableName: 'manager',
+		timestamps: true
 	});
 	return Manager;
 };
