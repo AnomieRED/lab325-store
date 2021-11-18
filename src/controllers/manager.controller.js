@@ -1,4 +1,4 @@
-import model from '../models/index';
+import model from '@model';
 import { validator } from '@validation/validator';
 
 const { Manager } = model;
@@ -16,10 +16,14 @@ class ManagerController {
 				limit,
 				where
 			});
-			if (allManager.length === 0) return res.json('Not found');
 			console.log('GET MANAGER');
-			res.status(200)
-				.json(allManager);
+			if (allManager.length === 0) {
+				return res.status(200)
+					.json('Not found');
+			} else {
+				res.status(200)
+					.json(allManager);
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -34,10 +38,14 @@ class ManagerController {
 					.json('Check your product ID');
 			}
 			const oneManager = await Manager.findByPk(managerId);
-			if (oneManager === null) return res.json('Manager not found');
 			console.log('DELETE MANAGER');
-			res.status(200)
-				.json(oneManager);
+			if (oneManager === null) {
+				return res.status(200)
+					.json('Manager not found');
+			} else {
+				res.status(200)
+					.json(oneManager);
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -84,10 +92,9 @@ class ManagerController {
 					id: managerId
 				}
 			});
-			if (updateManager[0] === 1) return res.json('true');
 			console.log('UPDATE MANAGER');
-			res.status(200)
-				.json(updateManager);
+			if (updateManager[0] === 1) return res.status(200)
+				.json('true');
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -102,14 +109,14 @@ class ManagerController {
 					id: managerId
 				}
 			});
-			if (deletedManager === 1) {
-				return res.json('true');
-			} else if (deletedManager === 0) {
-				return res.json('Not found');
-			}
 			console.log('DELETE MANAGER');
-			res.status(200)
-				.json(deletedManager);
+			if (deletedManager === 1) {
+				return res.status(200)
+					.json('true');
+			} else if (deletedManager === 0) {
+				return res.status(200)
+					.json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });

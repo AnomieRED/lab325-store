@@ -1,5 +1,5 @@
 /* eslint-disable */
-import model from '../models/index';
+import model from '@model';
 import { validator } from '@validation/validator';
 
 const {
