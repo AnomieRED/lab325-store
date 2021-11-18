@@ -18,7 +18,7 @@ module.exports = {
           key: 'id'
         },
         onUpdate: 'cascade',
-        onDelete: 'set null'
+        onDelete: 'cascade'
       },
       featureId: {
         type: Sequelize.INTEGER,
@@ -27,7 +27,7 @@ module.exports = {
           key: 'id'
         },
         onUpdate: 'cascade',
-        onDelete: 'set null'
+        onDelete: 'cascade'
       },
     });
   },

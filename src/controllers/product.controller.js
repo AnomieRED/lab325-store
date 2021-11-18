@@ -1,9 +1,11 @@
 /* eslint-disable */
 import model from '../models/index';
-import {sequelize} from '../models/index';
+import { sequelize } from '../models/index';
 // import {QueryInterface} from 'sequelize';
 import db from '../models/index';
 import { validator } from '@validation/validator';
+import { log } from 'nodemon/lib/utils';
+import { where } from 'sequelize';
 
 const {
 	Product,
@@ -30,8 +32,8 @@ class ProductController {
 				],
 				include: {
 					model: Feature,
-					attributes: ['title'],
-					through: {attributes: ['value']}
+					attributes: ['id', 'title'],
+					through: { attributes: ['value'] }
 				}
 			});
 			if (allProducts === null) return res.json('Not found');
@@ -53,8 +55,8 @@ class ProductController {
 				},
 				include: {
 					model: Feature,
-					attributes: ['title'],
-					through: {attributes: ['value']}
+					attributes: ['id', 'title'],
+					through: { attributes: ['value'] }
 				}
 			});
 			if (oneProduct === null) return res.json('Not found');
@@ -88,8 +90,8 @@ class ProductController {
 					attributes: ['id', 'name', 'description', 'price'],
 					include: {
 						model: Feature,
-						attributes: ['title'],
-						through: {attributes: ['value']}
+						attributes: ['id', 'title'],
+						through: { attributes: ['value'] }
 					}
 				}
 			});
@@ -113,8 +115,7 @@ class ProductController {
 				title,
 				value
 			} = req.body;
-			
-			if (!title) {
+			if (!title || !value) {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
@@ -134,11 +135,9 @@ class ProductController {
 				price,
 				managerId
 			});
+			const [newFeature, boolean] = await Feature.findOrCreate({ where: { title } });
 			
-			const [newFeature, isNew] = await Feature.findOrCreate({where: { title }});
-			
-			const a = await newProduct.addFeature(newFeature, { through: { value: 'test' } });
-			
+			await newProduct.addFeature(newFeature, { through: { value } });
 			await newProduct.reload({
 				include: {
 					model: Feature
@@ -164,14 +163,24 @@ class ProductController {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
-			const newFeature = await Feature.create({
-				title,
-				value,
-				productId: productId
+			const checkProduct = await Product.findOne({
+				where: {
+					id: productId
+				}
+			});
+			console.log(checkProduct);
+			const [newFeature, boolean] = await Feature.findOrCreate({
+				where: { title }
+			});
+			await checkProduct.addFeature(newFeature, { through: { value } });
+			await checkProduct.reload({
+				include: {
+					model: Feature
+				}
 			});
 			console.log('ADD FEATURE FOR PRODUCT');
 			res.status(201)
-				.json(newFeature);
+				.json(checkProduct);
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -204,17 +213,22 @@ class ProductController {
 	async editFeature(req, res) {
 		try {
 			const featureId = req.params.id;
-			const update = req.body;
-			const editFeature = await Feature.update(update, {
+			const updateFeature = req.body;
+			const editTitle = await Feature.update(updateFeature, {
 				where: {
 					id: featureId
 				}
 			});
+			const editValue = await productFeature.update(updateFeature, {
+				where: {
+					featureId: featureId
+				}
+			});
 			console.log('UPDATE FEATURE');
-			if (editFeature[0] === 1) {
+			if (editTitle[0] === 1 || editValue[0] === 1) {
 				res.status(200)
 					.json('true');
-			} else if (editFeature[0] === 0) {
+			} else if (editTitle[0] === 0 || editValue[0] === 0) {
 				res.status(200)
 					.json('Not found');
 			}
@@ -233,8 +247,13 @@ class ProductController {
 				}
 			});
 			console.log('DELETE PRODUCT');
-			res.status(200)
-				.json(deletedProduct);
+			if (deletedProduct === 1) {
+				res.status(200)
+					.json('true');
+			} else if (deletedProduct === 0) {
+				res.status(200)
+					.json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
