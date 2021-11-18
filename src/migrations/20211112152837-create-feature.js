@@ -11,15 +11,6 @@ module.exports = {
 			title: {
 				type: Sequelize.STRING
 			},
-			// productId: {
-			// 	type: Sequelize.INTEGER,
-			// 	references: {
-			// 		model: 'product',
-			// 		key: 'id'
-			// 	},
-			// 	onUpdate: 'CASCADE',
-			// 	onDelete: 'CASCADE'
-			// },
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE

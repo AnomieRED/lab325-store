@@ -1,11 +1,6 @@
 /* eslint-disable */
 import model from '../models/index';
-import { sequelize } from '../models/index';
-// import {QueryInterface} from 'sequelize';
-import db from '../models/index';
 import { validator } from '@validation/validator';
-import { log } from 'nodemon/lib/utils';
-import { where } from 'sequelize';
 
 const {
 	Product,
@@ -49,6 +44,9 @@ class ProductController {
 	async getOneProduct(req, res) {
 		try {
 			const productId = req.params.id;
+			if(!productId) {
+				return res.status(404).send({error: 'Fields cannot be empty'});
+			}
 			const oneProduct = await Product.findOne({
 				where: {
 					id: productId
@@ -71,10 +69,6 @@ class ProductController {
 	
 	async getProductByManager(req, res) {
 		try {
-			const {
-				offset = 1,
-				limit = 10
-			} = req.query;
 			const { name } = req.body;
 			console.log(name);
 			if (!name) {
@@ -159,7 +153,7 @@ class ProductController {
 				title,
 				value
 			} = req.body;
-			if (!title || !value) {
+			if (!productId || !title || !value) {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
@@ -190,6 +184,10 @@ class ProductController {
 	async editProduct(req, res) {
 		try {
 			const productId = req.params.id;
+			if (!productId) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
+			}
 			const update = req.body;
 			const editProduct = await Product.update(update, {
 				where: {
@@ -213,6 +211,9 @@ class ProductController {
 	async editFeature(req, res) {
 		try {
 			const featureId = req.params.id;
+			if(!featureId) {
+				return res.status(404).send({error: 'Fields cannot be empty'});
+			}
 			const updateFeature = req.body;
 			const editTitle = await Feature.update(updateFeature, {
 				where: {
@@ -241,6 +242,9 @@ class ProductController {
 	async deleteProduct(req, res) {
 		try {
 			const productId = req.params.id;
+			if(!productId) {
+				return res.status(404).send({error: 'Fields cannot be empty'});
+			}
 			const deletedProduct = await Product.destroy({
 				where: {
 					id: productId
