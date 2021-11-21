@@ -10,11 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			Manager.hasMany(models.Product, {
-				foreignKey: 'managerId',
-				onDelete: 'cascade',
-				onUpdate: 'cascade'
-			});
+			Manager.hasMany(models.Product, { foreignKey: 'managerId' });
 		}
 	}
 	
@@ -25,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
 	}, {
 		sequelize,
 		modelName: 'Manager',
-		tableName: 'manager'
+		tableName: 'manager',
+		timestamps: true
 	});
 	return Manager;
 };

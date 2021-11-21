@@ -1,14 +1,14 @@
 /* eslint-disable */
-import client from '@postgres';
-import model from '../models/index';
+import model from '@model';
 import { validator } from '@validation/validator';
 
 const {
-	Manager,
 	Product,
 	Feature,
-	ProductFeature
+	Manager,
+	productFeature
 } = model;
+
 
 class ProductController {
 	async getAllProduct(req, res) {
@@ -22,16 +22,16 @@ class ProductController {
 				offset,
 				limit,
 				where,
+				order: [
+					['id', 'ASC']
+				],
 				include: {
-					model: ProductFeature,
-					attributes: ['id', 'name'],
-					include: {
-						model: Feature,
-						attributes: ['value']
-					}
+					model: Feature,
+					attributes: ['id', 'title'],
+					through: { attributes: ['value'] }
 				}
 			});
-			if (allProducts.length === 0) return res.json('Not found');
+			if (allProducts === null) return res.json('Not found');
 			res.status(200)
 				.json(allProducts);
 			console.log('GET ALL PRODUCTS');
@@ -44,20 +44,20 @@ class ProductController {
 	async getOneProduct(req, res) {
 		try {
 			const productId = req.params.id;
+			if(!productId) {
+				return res.status(404).send({error: 'Fields cannot be empty'});
+			}
 			const oneProduct = await Product.findOne({
 				where: {
 					id: productId
 				},
 				include: {
-					model: ProductFeature,
-					attributes: ['id', 'name'],
-					include: {
-						model: Feature,
-						attributes: ['value']
-					}
+					model: Feature,
+					attributes: ['id', 'title'],
+					through: { attributes: ['value'] }
 				}
 			});
-			if (oneProduct.length === 0) return res.json('Not found');
+			if (oneProduct === null) return res.json('Not found');
 			console.log('GET ONE PRODUCT');
 			res.status(200)
 				.json(oneProduct);
@@ -67,31 +67,29 @@ class ProductController {
 		}
 	}
 	
-	async getProductManager(req, res) {
+	async getProductByManager(req, res) {
 		try {
-			// const managerId = req.params.id;
-			const {
-				offset = 1,
-				limit = 10
-			} = req.query;
-			const name = req.body;
+			const { name } = req.body;
+			console.log(name);
+			if (!name) {
+				res.status(404)
+					.send({ error: 'Please specify a manager' });
+			}
 			const oneManager = await Manager.findOne({
-				offset,
-				limit,
-				name,
+				where: {
+					name
+				},
 				include: {
 					model: Product,
 					attributes: ['id', 'name', 'description', 'price'],
 					include: {
-						model: ProductFeature,
-						attributes: ['name'],
-						include: {
-							model: Feature,
-							attributes: ['value']
-						}
+						model: Feature,
+						attributes: ['id', 'title'],
+						through: { attributes: ['value'] }
 					}
 				}
 			});
+			if (oneManager === null) return res.json('Not found');
 			console.log('GET PRODUCT MANAGER');
 			res.status(200)
 				.json(oneManager);
@@ -107,7 +105,7 @@ class ProductController {
 				name,
 				description,
 				price,
-				manager_id,
+				managerId,
 				title,
 				value
 			} = req.body;
@@ -115,12 +113,11 @@ class ProductController {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
-			console.log(req.body);
 			const check = validator.product({
 				name,
 				description,
 				price,
-				manager_id
+				managerId
 			});
 			if (check) {
 				return res.status(404)
@@ -130,22 +127,16 @@ class ProductController {
 				name,
 				description,
 				price,
-				manager_id
+				managerId
 			});
-			const newFeature = await Feature.create({ value });
-			const newProductFeatures = await ProductFeature.create({
-				title,
-				product_id: newProduct.id,
-				feature_id: newFeature.id
-			});
+			const [newFeature, boolean] = await Feature.findOrCreate({ where: { title } });
 			
+			await newProduct.addFeature(newFeature, { through: { value } });
 			await newProduct.reload({
 				include: {
-					model: ProductFeature,
-					include: [Feature]
+					model: Feature
 				}
 			});
-			console.log(newProductFeatures, newFeature);
 			console.log('CREATE PRODUCT');
 			res.status(201)
 				.json(newProduct);
@@ -159,25 +150,31 @@ class ProductController {
 		try {
 			const productId = req.params.id;
 			const {
-				key,
+				title,
 				value
 			} = req.body;
-			if (!key || !value) {
+			if (!productId || !title || !value) {
 				return res.status(404)
 					.send({ error: 'Fields cannot be empty' });
 			}
-			const newFeature = await Feature.create({
-				key,
-				value
+			const checkProduct = await Product.findOne({
+				where: {
+					id: productId
+				}
 			});
-			const addProductFeatures = await client.query(`
-			INSERT INTO product_features(product_id, feature_id)
-			VALUES(${productId}, ${newFeature.id});
-			`);
-			console.log(addProductFeatures);
+			console.log(checkProduct);
+			const [newFeature, boolean] = await Feature.findOrCreate({
+				where: { title }
+			});
+			await checkProduct.addFeature(newFeature, { through: { value } });
+			await checkProduct.reload({
+				include: {
+					model: Feature
+				}
+			});
 			console.log('ADD FEATURE FOR PRODUCT');
 			res.status(201)
-				.json(newFeature);
+				.json(checkProduct);
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -187,11 +184,24 @@ class ProductController {
 	async editProduct(req, res) {
 		try {
 			const productId = req.params.id;
+			if (!productId) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
+			}
 			const update = req.body;
-			const editProduct = await Product.update(productId, update);
+			const editProduct = await Product.update(update, {
+				where: {
+					id: productId
+				}
+			});
 			console.log('UPDATE PRODUCT');
-			res.status(200)
-				.json(editProduct);
+			if (editProduct[0] === 1) {
+				res.status(200)
+					.json('true');
+			} else if (editProduct[0] === 0) {
+				res.status(200)
+					.json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -201,11 +211,28 @@ class ProductController {
 	async editFeature(req, res) {
 		try {
 			const featureId = req.params.id;
-			const update = req.body;
-			const editFeature = await Feature.update(featureId, update);
+			if(!featureId) {
+				return res.status(404).send({error: 'Fields cannot be empty'});
+			}
+			const updateFeature = req.body;
+			const editTitle = await Feature.update(updateFeature, {
+				where: {
+					id: featureId
+				}
+			});
+			const editValue = await productFeature.update(updateFeature, {
+				where: {
+					featureId: featureId
+				}
+			});
 			console.log('UPDATE FEATURE');
-			res.status(200)
-				.json(editFeature);
+			if (editTitle[0] === 1 || editValue[0] === 1) {
+				res.status(200)
+					.json('true');
+			} else if (editTitle[0] === 0 || editValue[0] === 0) {
+				res.status(200)
+					.json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -215,17 +242,22 @@ class ProductController {
 	async deleteProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			const deletedProduct = await Product.delete(productId);
-			const deleteFeature = await client.query(`
-			WITH f as (DELETE FROM feature WHERE id IN
-			(SELECT f.id FROM feature as f JOIN product_features as pf on f.id = pf.feature_id WHERE pf.product_id = ${productId}))
-			DELETE FROM product_features WHERE id IN
-			(SELECT pf.feature_id FROM products as p JOIN product_features as pf on p.id = pf.product_id WHERE p.id = ${productId})
-			`);
-			console.log(deleteFeature);
+			if(!productId) {
+				return res.status(404).send({error: 'Fields cannot be empty'});
+			}
+			const deletedProduct = await Product.destroy({
+				where: {
+					id: productId
+				}
+			});
 			console.log('DELETE PRODUCT');
-			res.status(200)
-				.json(deletedProduct);
+			if (deletedProduct === 1) {
+				res.status(200)
+					.json('true');
+			} else if (deletedProduct === 0) {
+				res.status(200)
+					.json('Not found');
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });

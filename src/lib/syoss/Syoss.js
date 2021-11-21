@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 
 export class Syoss {
 	_db;
+	
 	constructor(user, host, database, password, { port = 5432 } = {}) {
 		const pool = new Pool({
 			user,
