@@ -87,6 +87,11 @@ class ManagerController {
 		try {
 			const managerId = req.params.id;
 			const update = req.body;
+			const checkManager = await Manager.findByPk(managerId);
+			if (!checkManager) {
+				return res.status(404)
+					.send({ error: 'Manager not found' });
+			}
 			const updateManager = await Manager.update(update, {
 				where: {
 					id: managerId
@@ -104,6 +109,11 @@ class ManagerController {
 	async deleteManager(req, res) {
 		try {
 			const managerId = req.params.id;
+			const checkManager = await Manager.findByPk(managerId);
+			if (!checkManager) {
+				return res.status(404)
+					.send({ error: 'Manager not found' });
+			}
 			const deletedManager = await Manager.destroy({
 				where: {
 					id: managerId
@@ -113,9 +123,6 @@ class ManagerController {
 			if (deletedManager === 1) {
 				return res.status(200)
 					.json('true');
-			} else if (deletedManager === 0) {
-				return res.status(200)
-					.json('Not found');
 			}
 		} catch (error) {
 			res.status(500)

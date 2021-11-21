@@ -1,4 +1,6 @@
 /* eslint-disable */
+import { ON_SALE, NOT_AVAILABLE } from '../constants/productEnum';
+
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
 		await queryInterface.bulkInsert(
@@ -9,6 +11,7 @@ module.exports = {
 					description: 'made in USA',
 					price: 4000,
 					managerId: 1,
+					availability: ON_SALE,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
@@ -17,6 +20,7 @@ module.exports = {
 					description: 'QHD 2k 144Hz',
 					price: 11000,
 					managerId: 2,
+					availability: ON_SALE,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
@@ -25,6 +29,7 @@ module.exports = {
 					description: 'made in China',
 					price: 800,
 					managerId: 1,
+					availability: ON_SALE,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				},
@@ -33,6 +38,7 @@ module.exports = {
 					description: 'for game',
 					price: 25000,
 					managerId: 2,
+					availability: NOT_AVAILABLE,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}

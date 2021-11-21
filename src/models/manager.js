@@ -26,3 +26,6 @@ module.exports = (sequelize, DataTypes) => {
 	});
 	return Manager;
 };
+
+export class Manager {
+}

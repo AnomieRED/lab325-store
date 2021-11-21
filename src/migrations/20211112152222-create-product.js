@@ -1,4 +1,6 @@
 /* eslint-disable */
+import { ON_SALE, NOT_AVAILABLE } from '../constants/productEnum';
+
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
 		await queryInterface.createTable('product', {
@@ -16,6 +18,12 @@ module.exports = {
 			},
 			price: {
 				type: Sequelize.FLOAT
+			},
+			availability: {
+				type: Sequelize.ENUM(
+					ON_SALE,
+					NOT_AVAILABLE
+				)
 			},
 			managerId: {
 				type: Sequelize.INTEGER,
