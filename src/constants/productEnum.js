@@ -1,2 +1,2 @@
-export const ON_SALE = 'Product on sale';
-export const NOT_AVAILABLE = 'Product not available';
+export const ON_SALE = 'on_sale';
+export const NOT_AVAILABLE = 'not_available';

@@ -37,12 +37,12 @@ const managerResolver = {
 			});
 		},
 		
-		async updateManager(_, arg) {
-			const oneManager = await Manager.findByPk(arg.id);
+		async updateManager(_, args) {
+			const oneManager = await Manager.findByPk(args.id);
 			if (!oneManager) throw new Error('Manager not found');
-			const updateManager = await Manager.update(arg, {
+			const updateManager = await Manager.update(args, {
 				where: {
-					id: arg.id
+					id: args.id
 				}
 			});
 			if (updateManager[0] === 1) return true;

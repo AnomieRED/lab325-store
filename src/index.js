@@ -18,7 +18,7 @@ async function serverStart() {
 		resolvers
 	});
 	await server.start();
-	server.applyMiddleware({ app });
+	server.applyMiddleware({ app, path: '/api' });
 	app.listen(PORT, () => {
 		console.log(`🚀 Server has been started on port ${PORT}...`);
 	});
