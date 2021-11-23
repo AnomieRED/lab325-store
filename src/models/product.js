@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { ON_SALE, NOT_AVAILABLE } from '../constants/productEnum';
+import { ON_SALE, NOT_AVAILABLE } from '../constants/ProductEnum';
 
 const {
 	Model

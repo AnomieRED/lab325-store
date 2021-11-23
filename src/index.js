@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { ApolloServer } from 'apollo-server-express';
-import typeDefs from './graphql/schemas';
-import resolvers from './graphql/resolvers';
+import { resolvers, typeDefs } from './graphDefenition';
+import model from '@model'
 import express from 'express';
 import productRouter from '@router/product.router';
 import managerRouter from '@router/manager.router';
@@ -15,7 +15,8 @@ async function serverStart() {
 	app.use('/', managerRouter);
 	const server = new ApolloServer({
 		typeDefs,
-		resolvers
+		resolvers,
+		context: () => model
 	});
 	await server.start();
 	server.applyMiddleware({ app, path: '/api' });
