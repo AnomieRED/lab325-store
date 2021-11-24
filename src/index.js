@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import { ApolloServer } from 'apollo-server-express';
+import { graphqlUploadExpress } from 'graphql-upload';
 import { resolvers, typeDefs } from './graphDefenition';
-import model from '@model'
+import model from '@model';
 import express from 'express';
 import productRouter from '@router/product.router';
 import managerRouter from '@router/manager.router';
@@ -18,8 +19,12 @@ async function serverStart() {
 		resolvers,
 		context: () => model
 	});
+	app.use(graphqlUploadExpress());
 	await server.start();
-	server.applyMiddleware({ app, path: '/api' });
+	server.applyMiddleware({
+		app,
+		path: '/api'
+	});
 	app.listen(PORT, () => {
 		console.log(`🚀 Server has been started on port ${PORT}...`);
 	});

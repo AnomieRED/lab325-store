@@ -7,7 +7,7 @@ export default {
           getOneManager(id: ID!): Manager
       }
 	`,
-	resolverFunc: async (parant, { id }, { Manager }) => {
+	resolverFunc: async (parent, { id }, { Manager }) => {
 		const oneManager = await Manager.findByPk(id);
 		if (!oneManager) throw new Error('Manager not found');
 		return oneManager;

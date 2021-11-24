@@ -9,7 +9,7 @@ export default {
           createManager(name: String!, surname: String!, phone:String!): Manager
       }
 	`,
-	resolverFunc: async (parant, {
+	resolverFunc: async (parent, {
 		name,
 		surname,
 		phone

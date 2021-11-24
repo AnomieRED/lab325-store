@@ -7,7 +7,7 @@ export default {
           updateManager(id: ID!, name: String, surname:String, phone:String): Boolean
       }
 	`,
-	resolverFunc: async (parant, args, { Manager }) => {
+	resolverFunc: async (parent, args, { Manager }) => {
 		const oneManager = await Manager.findByPk(args.id);
 		if (!oneManager) throw new Error('Manager not found');
 		const updateManager = await Manager.update(args, {

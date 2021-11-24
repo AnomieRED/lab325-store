@@ -7,7 +7,7 @@ export default {
           getOneProduct(id: ID!): Product
       }
 	`,
-	resolverFunc: async (parant, { id }, {
+	resolverFunc: async (parent, { id }, {
 		Manager,
 		Product,
 		Feature

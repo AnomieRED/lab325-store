@@ -7,7 +7,7 @@ export default {
           createFeature(id:ID!, title: String!, value:String!): Product
       }
 	`,
-	resolverFunc: async (parant, args, {
+	resolverFunc: async (parent, args, {
 		Manager,
 		Product,
 		Feature

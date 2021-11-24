@@ -7,7 +7,7 @@ export default {
           editFeature(id: ID!, title: String, value: String): String
       }
 	`,
-	resolverFunc: async (parant, args, {
+	resolverFunc: async (parent, args, {
 		Feature,
 		productFeature
 	}) => {

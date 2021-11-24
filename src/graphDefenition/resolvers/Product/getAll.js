@@ -1,3 +1,5 @@
+const { SERVER_PORT } = process.env
+
 export default {
 	type: 'query',
 	name: 'getAllProduct',
@@ -15,7 +17,7 @@ export default {
 		Product,
 		Feature
 	}) => {
-		return await Product.findAll({
+		const allProduct = await Product.findAll({
 			limit,
 			offset,
 			order: [
@@ -23,6 +25,11 @@ export default {
 			],
 			include: [Manager, Feature]
 		});
+		allProduct.forEach(product => {
+			if(product.image === null) return
+			product.image = `http://localhost:${SERVER_PORT}${product.image}`
+		});
+		return allProduct;
 	}
 };
 

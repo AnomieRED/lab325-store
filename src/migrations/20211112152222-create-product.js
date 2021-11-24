@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { ON_SALE, NOT_AVAILABLE } from '../constants/ProductEnum';
+import { ON_SALE, NOT_AVAILABLE } from '@enum';
 
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
@@ -18,6 +18,9 @@ module.exports = {
 			},
 			price: {
 				type: Sequelize.FLOAT
+			},
+			image: {
+				type: Sequelize.STRING
 			},
 			availability: {
 				type: Sequelize.ENUM(

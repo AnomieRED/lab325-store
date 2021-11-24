@@ -7,7 +7,7 @@ export default {
           deleteManager(id: ID!): Boolean
       }
 	`,
-	resolverFunc: async (parant, { id }, { Manager }) => {
+	resolverFunc: async (parent, { id }, { Manager }) => {
 		const checkManager = await Manager.findByPk(id);
 		if (!checkManager) throw new Error('Manager not found');
 		console.log(id);

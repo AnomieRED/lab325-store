@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { ON_SALE, NOT_AVAILABLE } from '../constants/ProductEnum';
+import { ON_SALE, NOT_AVAILABLE } from '@enum';
 
 const {
 	Model
@@ -29,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 		name: DataTypes.STRING,
 		description: DataTypes.STRING,
 		price: DataTypes.INTEGER,
+		image: DataTypes.STRING,
 		availability: DataTypes.ENUM(ON_SALE, NOT_AVAILABLE),
 		managerId: DataTypes.INTEGER
 	}, {
