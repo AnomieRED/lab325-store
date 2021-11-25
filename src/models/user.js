@@ -40,10 +40,10 @@ module.exports = (sequelize, DataTypes) => {
 		}
 		
 		static async findUserId(req) {
-			const { Role } = models;
-			if (req) {
+			try {
+				const { Role } = models;
 				const authToken = req.headers.authorization;
-				if (!authToken) throw new Error('No token found');
+				if (!authToken) return new Error('No token found');
 				const { userId } = User.getTokenPayload(authToken);
 				return userId ? await User.findOne({
 					where: {
@@ -51,6 +51,9 @@ module.exports = (sequelize, DataTypes) => {
 					},
 					include: [Role]
 				}) : null;
+			} catch (error) {
+				console.log(error);
+				return null;
 			}
 		}
 	}
@@ -58,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
 	User.init({
 		email: DataTypes.STRING,
 		password: DataTypes.STRING,
-		role: DataTypes.INTEGER,
+		role: DataTypes.INTEGER
 		
 	}, {
 		sequelize,

@@ -13,8 +13,11 @@ export default {
 	resolverFunc: async (parent, {
 		limit,
 		offset
-	}, { user, model: { Manager } }) => {
-		if(user === null) return null;
+	}, {
+		                     user,
+		                     model: { Manager }
+	                     }) => {
+		if (user === null) return null;
 		return Manager.findAll({
 			limit,
 			offset,

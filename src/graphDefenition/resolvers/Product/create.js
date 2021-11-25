@@ -19,7 +19,7 @@ export default {
           availability: ProductEnum!
           managerId: Int!
       }
-      
+
       type Mutation{
           createProduct(product: createProductInput!): Product
       }
@@ -27,12 +27,12 @@ export default {
 	resolverFunc: async (parent, {
 		product
 	}, {
-		model: {
-			Manager,
-			Product,
-			Feature,
-			sequelize
-		}
+     model: {
+       Manager,
+       Product,
+       Feature,
+       sequelize
+     }
 		}) => {
 		const transaction = await sequelize.transaction();
 		try {

@@ -103,7 +103,7 @@ class ProductController {
 	}
 	
 	async getImage(req, res) {
-		try  {
+		try {
 			const productId = req.params.id;
 			if (!productId) {
 				return res.status(404)
@@ -114,12 +114,14 @@ class ProductController {
 					id: productId
 				}
 			});
-			if(findImage === null) {
-				return res.status(404).send({error: 'Product not found'});
+			if (findImage === null) {
+				return res.status(404)
+					.send({ error: 'Product not found' });
 			}
 			const path = `${PATH_IMAGE}${findImage.image}`;
-			if(findImage.image === null) {
-				return res.status(404).send({error: 'Image not found'});
+			if (findImage.image === null) {
+				return res.status(404)
+					.send({ error: 'Image not found' });
 			} else {
 				res.sendFile(path);
 			}

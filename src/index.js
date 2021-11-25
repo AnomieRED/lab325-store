@@ -20,7 +20,10 @@ async function serverStart() {
 		typeDefs,
 		resolvers,
 		context: async ({ req }) => {
-			return { user: req && req.headers.authorization ? await User.findUserId(req) : null, model };
+			return {
+				user: req && req.headers.authorization ? await User.findUserId(req) : null,
+				model
+			};
 		}
 	});
 	app.use(graphqlUploadExpress());

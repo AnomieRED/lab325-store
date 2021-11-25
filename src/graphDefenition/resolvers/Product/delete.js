@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { ROLE_ADMIN } from '@role';
+
 const { PATH_IMAGE } = process.env;
 
 export default {

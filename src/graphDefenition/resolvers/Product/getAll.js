@@ -1,5 +1,6 @@
 import { ROLE_ADMIN, ROLE_USER } from '@role';
-const { SERVER_PORT } = process.env
+
+const { SERVER_PORT } = process.env;
 
 export default {
 	type: 'query',
@@ -15,12 +16,12 @@ export default {
 		limit,
 		offset
 	}, {
-		model: {
-			Manager,
-			Product,
-			Feature
-		}
-	}) => {
+     model: {
+       Manager,
+       Product,
+       Feature
+     }
+		}) => {
 		const allProduct = await Product.findAll({
 			limit,
 			offset,
@@ -30,8 +31,8 @@ export default {
 			include: [Manager, Feature]
 		});
 		allProduct.forEach(product => {
-			if(product.image === null) return
-			product.image = `http://localhost:${SERVER_PORT}${product.image}`
+			if (product.image === null) return;
+			product.image = `http://localhost:${SERVER_PORT}${product.image}`;
 		});
 		return allProduct;
 	}
