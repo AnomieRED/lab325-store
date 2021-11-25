@@ -114,8 +114,10 @@ class ProductController {
 					id: productId
 				}
 			});
+			if(findImage === null) {
+				return res.status(404).send({error: 'Product not found'});
+			}
 			const path = `${PATH_IMAGE}${findImage.image}`;
-			console.log(path);
 			if(findImage.image === null) {
 				return res.status(404).send({error: 'Image not found'});
 			} else {

@@ -1,5 +1,6 @@
 import path from 'path';
 import typeDefinitions from './typeDefs';
+import { Admin, isAuthenticatedMiddleware } from './middleware';
 
 /*
 * CREATE RESOLVER
@@ -29,16 +30,22 @@ import typeDefinitions from './typeDefs';
 
 
 import graphDefinitionGenerator from 'apollo-graph-definition-generator';
+import { combineResolvers } from 'graphql-resolvers';
+import { ROLE_ADMIN, ROLE_USER } from '@role';
 
-const { resolvers, typeDefs, enums } = graphDefinitionGenerator({
+const {
+	resolvers,
+	typeDefs,
+	enums
+} = graphDefinitionGenerator({
 	typeDefs: typeDefinitions,
 	resolversDir: path.resolve(__dirname, 'resolvers'),
 	prepareMiddlewares: [
-		// resolver => {
-		// 	return (root, args) => {
-		// 		// validate args for example
-		// 	};
-		// }
+		resolver => {
+			if (resolver.roleAccess) {
+				return resolver.roleAccess.includes(ROLE_USER) ? isAuthenticatedMiddleware : combineResolvers(isAuthenticatedMiddleware, Admin(ROLE_ADMIN));
+			}
+		}
 	],
 	enumsDir: path.resolve(__dirname, '..', 'constants'),
 	enumsKeywords: []

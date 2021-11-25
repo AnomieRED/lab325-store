@@ -4,6 +4,8 @@ System.config({
 		'@router/*': './src/routes/*',
 		'@controller/*': './src/controllers/*',
 		'@model': './src/models/index',
-		'@enum': './src/constants/ProductEnum'
+		'@enum': './src/constants/ProductEnum',
+		'@role': './src/constants/Role/userRole',
+		'@upload': './src/upload/imageUpload'
 	}
 });

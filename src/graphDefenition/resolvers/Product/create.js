@@ -1,10 +1,12 @@
 /* eslint-disable */
 import { validator } from '@validation/validator';
-import imageUpload from '../../../upload/imageUpload';
+import imageUpload from '@upload';
+import { ROLE_ADMIN } from '@role';
 
 export default {
 	type: 'mutation',
 	name: 'createProduct',
+	roleAccess: [ROLE_ADMIN],
 	// language=graphql
 	typeDef: `
       input createProductInput {
@@ -25,10 +27,12 @@ export default {
 	resolverFunc: async (parent, {
 		product
 	}, {
-		Manager,
-		Product,
-		Feature,
-		sequelize
+		model: {
+			Manager,
+			Product,
+			Feature,
+			sequelize
+		}
 		}) => {
 		const transaction = await sequelize.transaction();
 		try {

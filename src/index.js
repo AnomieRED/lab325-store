@@ -9,6 +9,8 @@ import managerRouter from '@router/manager.router';
 
 const PORT = process.env.SERVER_PORT || 8080;
 
+const { User } = model;
+
 async function serverStart() {
 	const app = express();
 	app.use(express.json());
@@ -17,7 +19,9 @@ async function serverStart() {
 	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
-		context: () => model
+		context: async ({ req }) => {
+			return { user: req && req.headers.authorization ? await User.findUserId(req) : null, model };
+		}
 	});
 	app.use(graphqlUploadExpress());
 	await server.start();

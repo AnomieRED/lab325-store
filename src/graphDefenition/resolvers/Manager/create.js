@@ -1,8 +1,10 @@
 import { validator } from '@validation/validator';
+import { ROLE_ADMIN } from '@role';
 
 export default {
 	type: 'mutation',
 	name: 'createManager',
+	roleAccess: [ROLE_ADMIN],
 	// language=graphql
 	typeDef: `
       type Mutation{
@@ -13,7 +15,7 @@ export default {
 		name,
 		surname,
 		phone
-	}, { Manager }) => {
+	}, { model: { Manager } }) => {
 		const check = validator.manager({
 			name,
 			surname,

@@ -1,6 +1,9 @@
+import { ROLE_ADMIN } from '@role';
+
 export default {
 	type: 'mutation',
 	name: 'editFeature',
+	roleAccess: [ROLE_ADMIN],
 	// language=graphql
 	typeDef: `
       type Mutation{
@@ -8,8 +11,10 @@ export default {
       }
 	`,
 	resolverFunc: async (parent, args, {
-		Feature,
-		productFeature
+		model: {
+			Feature,
+			productFeature
+		}
 	}) => {
 		if (!args.id) throw new Error('Fields cannot be empty');
 		const editTitle = await Feature.update(args, {
