@@ -1,9 +1,9 @@
 import fs from 'fs';
 
 export default function imageUpload({
-	                                    stream,
-	                                    filename
-                                    }) {
+  stream,
+  filename
+}) {
 	const uploadDir = '/usr/src/app/data/photos';
 	const path = `${uploadDir}/${filename}`;
 	return new Promise((resolve, reject) =>

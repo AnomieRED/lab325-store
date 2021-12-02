@@ -14,10 +14,8 @@ export default {
 		limit,
 		offset
 	}, {
-		                     user,
-		                     model: { Manager }
-	                     }) => {
-		if (user === null) return null;
+   model: { Manager }
+ }) => {
 		return Manager.findAll({
 			limit,
 			offset,

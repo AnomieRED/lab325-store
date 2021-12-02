@@ -8,7 +8,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - "./data/db.products.json:/usr/src/app/data/db.products.json"
       - "./src:/usr/src/app/src"
     links:
       - "postgres:postgres"

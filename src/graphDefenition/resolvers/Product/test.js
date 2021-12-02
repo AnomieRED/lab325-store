@@ -4,24 +4,21 @@ const { SERVER_PORT } = process.env;
 
 export default {
 	type: 'query',
-	name: 'getAllProduct',
+	name: 'TestResolver',
 	roleAccess: [ROLE_USER, ROLE_ADMIN],
 	// language=graphql
 	typeDef: `
       type Query{
-          getAllProduct(limit: Int, offset: Int): [Product!]!
+          TestResolver(limit: Int, offset: Int): [Product!]!
       }
 	`,
-	resolverFunc: async (parent, {
-		limit,
-		offset
-	}, {
-     model: {
-       Manager,
-       Product,
-       Feature
-     }
-		}) => {
+	resolverFunc: async (parent, { limit, offset }, {
+		model: {
+			Manager,
+			Product,
+			Feature
+		}
+	}) => {
 		const allProduct = await Product.findAll({
 			limit,
 			offset,
