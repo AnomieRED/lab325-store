@@ -2,6 +2,8 @@
 import model from '@model';
 import { validator } from '@validation/validator';
 
+const { PATH_IMAGE } = process.env;
+
 const {
 	Product,
 	Feature,
@@ -44,8 +46,9 @@ class ProductController {
 	async getOneProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			if(!productId) {
-				return res.status(404).send({error: 'Fields cannot be empty'});
+			if (!productId) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
 			}
 			const oneProduct = await Product.findOne({
 				where: {
@@ -93,6 +96,35 @@ class ProductController {
 			console.log('GET PRODUCT MANAGER');
 			res.status(200)
 				.json(oneManager);
+		} catch (error) {
+			res.status(500)
+				.send({ error: error.message });
+		}
+	}
+	
+	async getImage(req, res) {
+		try {
+			const productId = req.params.id;
+			if (!productId) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
+			}
+			const findImage = await Product.findOne({
+				where: {
+					id: productId
+				}
+			});
+			if (findImage === null) {
+				return res.status(404)
+					.send({ error: 'Product not found' });
+			}
+			const path = `${PATH_IMAGE}${findImage.image}`;
+			if (findImage.image === null) {
+				return res.status(404)
+					.send({ error: 'Image not found' });
+			} else {
+				res.sendFile(path);
+			}
 		} catch (error) {
 			res.status(500)
 				.send({ error: error.message });
@@ -211,8 +243,9 @@ class ProductController {
 	async editFeature(req, res) {
 		try {
 			const featureId = req.params.id;
-			if(!featureId) {
-				return res.status(404).send({error: 'Fields cannot be empty'});
+			if (!featureId) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
 			}
 			const updateFeature = req.body;
 			const editTitle = await Feature.update(updateFeature, {
@@ -242,8 +275,9 @@ class ProductController {
 	async deleteProduct(req, res) {
 		try {
 			const productId = req.params.id;
-			if(!productId) {
-				return res.status(404).send({error: 'Fields cannot be empty'});
+			if (!productId) {
+				return res.status(404)
+					.send({ error: 'Fields cannot be empty' });
 			}
 			const deletedProduct = await Product.destroy({
 				where: {

@@ -8,7 +8,7 @@ COPY .npmrc ./
 
 RUN npm i
 
-RUN npm i pm2 @babel/cli @babel/node @babel/core @babel/preset-env -g
+RUN npm i pm2 @babel/cli @babel/node @babel/core @babel/preset-env sequelize-cli -g
 
 COPY . .
 

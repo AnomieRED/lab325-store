@@ -1,37 +1,24 @@
 /* eslint-disable */
-import { ON_SALE, NOT_AVAILABLE } from '@enum';
-
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		await queryInterface.createTable('product', {
+		await queryInterface.createTable('user', {
 			id: {
 				allowNull: false,
 				autoIncrement: true,
 				primaryKey: true,
 				type: Sequelize.INTEGER
 			},
-			name: {
+			email: {
+				type: Sequelize.STRING,
+				unique: true
+			},
+			password: {
 				type: Sequelize.STRING
 			},
-			description: {
-				type: Sequelize.STRING
-			},
-			price: {
-				type: Sequelize.FLOAT
-			},
-			image: {
-				type: Sequelize.STRING
-			},
-			availability: {
-				type: Sequelize.ENUM(
-					ON_SALE,
-					NOT_AVAILABLE
-				)
-			},
-			managerId: {
+			role: {
 				type: Sequelize.INTEGER,
 				references: {
-					model: 'manager',
+					model: 'role',
 					key: 'id'
 				},
 				onUpdate: 'CASCADE',
@@ -48,6 +35,6 @@ module.exports = {
 		});
 	},
 	down: async (queryInterface, Sequelize) => {
-		await queryInterface.dropTable('product');
+		await queryInterface.dropTable('user');
 	}
 };

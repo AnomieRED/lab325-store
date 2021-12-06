@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 			Feature.belongsToMany(models.Product, {
 				through: 'productFeature',
 				foreignKey: 'featureId'
-			})
+			});
 		}
 	}
 	
