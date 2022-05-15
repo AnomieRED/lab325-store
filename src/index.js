@@ -13,28 +13,27 @@ const { User } = model;
 
 async function serverStart() {
 	const app = express();
+	
 	app.use(express.json());
+	
 	app.use('/', productRouter);
 	app.use('/', managerRouter);
+	
 	const server = new ApolloServer({
-		typeDefs,
-		resolvers,
+		typeDefs, resolvers,
 		context: async ({ req }) => {
-			return {
-				user: req && req.headers.authorization ? await User.findUserId(req) : null,
-				model
-			};
+			return { user: req && req.headers.authorization ? await User.findUserId(req) : null, model };
 		}
 	});
 	app.use(graphqlUploadExpress());
+	
 	await server.start();
-	server.applyMiddleware({
-		app,
-		path: '/api'
-	});
+	
+	server.applyMiddleware({ app, path: '/api' });
+	
 	app.listen(PORT, () => {
-		console.log(`🚀 Server has been started on port ${PORT}...`);
+		console.log(`🚀 Server has been started on port http://localhost${PORT}...`);
 	});
 }
 
-serverStart();
+serverStart().catch(console.error);
